@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import express from 'express';
-import { setupMiddlewares } from './v1/middlewares/index';
+import { setupMiddlewares } from './middlewares/index';
 import dotenv from 'dotenv';
-import loadConfig from './v1/config/configLoader';
-import connectDB from './v1/config/database';
+import loadConfig from './config/configLoader';
+import connectDB from './config/database';
 
 dotenv.config();
 
