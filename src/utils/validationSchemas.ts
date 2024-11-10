@@ -1,6 +1,6 @@
 // src/utils/validationSchemas.ts
 
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
 export const registerSchema = [
   body('email')
@@ -75,4 +75,9 @@ export const verifyEmailSchema = [
 
 export const refreshTokenSchema = [
   body('refreshToken').exists({ checkFalsy: true }).withMessage('Refresh token is required.'),
+];
+
+export const getItemsSchema = [
+  query('page').exists({ checkFalsy: true }).withMessage('page index is required.'),
+  query('pageSize').exists({ checkFalsy: true }).withMessage('page size is required.'),
 ];
