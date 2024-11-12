@@ -6,5 +6,5 @@ export interface BaseResponse {
 }
 
 export interface GetItemsResponse extends BaseResponse {
-  data: IItem[] | null;
+  data: { items: IItem[]; count: number } | null;
 }

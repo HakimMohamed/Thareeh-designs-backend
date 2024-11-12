@@ -6,6 +6,10 @@ export interface IItem extends Document {
   description: string;
   image: string;
   category: string;
+  discount: {
+    active: boolean;
+    value: number;
+  };
 }
 
 const itemsSchema = new Schema(
@@ -15,6 +19,10 @@ const itemsSchema = new Schema(
     description: { type: String, required: true },
     image: { type: String, required: true },
     category: { type: String, required: true, ref: 'Category' },
+    discount: {
+      active: { type: Boolean, default: false },
+      value: { type: Number, default: 0 },
+    },
   },
   { timestamps: true }
 );
