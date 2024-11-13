@@ -72,16 +72,16 @@ class UserService {
     });
   }
   async checkUserExistance(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email: email.toLowerCase() }).lean()) as IUser | null;
+    return User.findOne({ email: email.toLowerCase() }).lean<IUser | null>();
   }
   async checkEmailExistance(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email }).lean()) as IUser | null;
+    return User.findOne({ email }).lean<IUser | null>();
   }
   async getUserByEmail(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email }).lean()) as IUser | null;
+    return User.findOne({ email }).lean<IUser | null>();
   }
   async getUserById(id: string): Promise<IUser | null> {
-    return (await User.findOne({ _id: toObjectId(id) }).lean()) as IUser | null;
+    return User.findOne({ _id: toObjectId(id) }).lean<IUser | null>();
   }
   async validateUser(user: IUser, password: string): Promise<Boolean> {
     return bcrypt.compare(password, user.password);
@@ -123,7 +123,7 @@ class UserService {
 
     match.email = email;
 
-    return UserOtp.findOne().lean() as Promise<IUserOtp | null>;
+    return UserOtp.findOne().lean<IUserOtp | null>();
   }
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);

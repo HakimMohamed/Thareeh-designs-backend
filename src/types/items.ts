@@ -8,3 +8,7 @@ export interface BaseResponse {
 export interface GetItemsResponse extends BaseResponse {
   data: { items: IItem[]; count: number } | null;
 }
+
+export interface GetItemByIdResponse extends BaseResponse {
+  data: IItem | null;
+}

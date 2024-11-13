@@ -85,3 +85,7 @@ export const getItemsSchema = [
     .isLength({ min: 1, max: 100 })
     .withMessage('Otp must be exactly 4 characters long.'),
 ];
+
+export const getItemByIdSchema = [
+  query('id').exists({ checkFalsy: true }).withMessage('Item id is required.'),
+];

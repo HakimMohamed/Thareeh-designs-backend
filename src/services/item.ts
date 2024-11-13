@@ -13,6 +13,9 @@ class ItemService {
 
     return { items, count };
   }
+  async getItemById(id: string): Promise<IItem | null> {
+    return Item.findById(id).lean<IItem | null>();
+  }
 }
 
 export default new ItemService();
