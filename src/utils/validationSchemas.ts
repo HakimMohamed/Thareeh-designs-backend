@@ -1,6 +1,6 @@
 // src/utils/validationSchemas.ts
 
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const registerSchema = [
   body('email')
@@ -87,5 +87,9 @@ export const getItemsSchema = [
 ];
 
 export const getItemByIdSchema = [
-  query('id').exists({ checkFalsy: true }).withMessage('Item id is required.'),
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
 ];
