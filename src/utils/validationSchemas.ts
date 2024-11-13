@@ -79,5 +79,9 @@ export const refreshTokenSchema = [
 
 export const getItemsSchema = [
   query('page').exists({ checkFalsy: true }).withMessage('page index is required.'),
-  query('pageSize').exists({ checkFalsy: true }).withMessage('page size is required.'),
+  query('pageSize')
+    .exists({ checkFalsy: true })
+    .withMessage('page size is required.')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Otp must be exactly 4 characters long.'),
 ];
