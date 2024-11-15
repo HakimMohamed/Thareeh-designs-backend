@@ -17,7 +17,7 @@ import {
 } from '../types/auth';
 import AuthService from '../services/auth';
 import bcrypt from 'bcryptjs';
-import helpers from '../utils/helpers';
+import { formatEgyptianTime } from '../utils/helpers';
 
 export async function register(
   req: Request<{}, {}, RegisterDto>,
@@ -79,7 +79,7 @@ export async function completeRegsitration(
 
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
+    const formattedDate = formatEgyptianTime(tenMinutesAgo);
 
     const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
 
@@ -148,7 +148,7 @@ export async function verifyEmail(
 
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
+    const formattedDate = formatEgyptianTime(tenMinutesAgo);
 
     const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
 

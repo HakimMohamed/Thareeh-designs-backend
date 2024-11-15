@@ -8,7 +8,7 @@ import { ObjectId } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import createEmailTransporter from '../config/nodeMailer';
 import LoggingService from './logs';
-import helpers, { toObjectId } from '../utils/helpers';
+import { toObjectId, formatEgyptianTime } from '../utils/helpers';
 
 class UserService {
   private transporter: Transporter;
@@ -128,7 +128,7 @@ class UserService {
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
+    const formattedDate = formatEgyptianTime(tenMinutesAgo);
 
     const otpDoc = await this.getUserOtpByDate({ email, date: formattedDate });
 
