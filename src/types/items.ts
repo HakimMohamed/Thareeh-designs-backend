@@ -12,3 +12,7 @@ export interface GetItemsResponse extends BaseResponse {
 export interface GetItemByIdResponse extends BaseResponse {
   data: IItem | null;
 }
+
+export interface GetFeaturedItemsResponse extends BaseResponse {
+  data: IItem[] | null;
+}

@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { GetItemByIdQueryParams, GetItemsQueryParams } from '../types/query-parameters';
-import { GetItemByIdResponse, GetItemsResponse } from '../types/items';
+import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
 import ItemService from '../services/item';
+import { FeaturedItemsDto } from '../dtos/auth.dto';
 
 export async function getItems(
   req: Request<{}, {}, {}, GetItemsQueryParams>,
@@ -32,6 +33,26 @@ export async function getItemById(
 
   try {
     const item = await ItemService.getItemById(id as string);
+
+    res.status(200).send({
+      message: `Items fetched successfully.`,
+      data: item,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function getFeaturedItems(
+  req: Request,
+  res: Response<GetFeaturedItemsResponse>,
+  next: NextFunction
+): Promise<void> {
+  const { pageSize, excludeId } = req.query;
+
+  try {
+    const item = await ItemService.getFeaturedItems(excludeId as string, Number(pageSize));
 
     res.status(200).send({
       message: `Items fetched successfully.`,

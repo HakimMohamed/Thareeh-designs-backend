@@ -1,4 +1,5 @@
 import Item, { IItem } from '../models/Item';
+import { toObjectId } from '../utils/helpers';
 class ItemService {
   async getItems(page: number, pageSize: number): Promise<{ items: IItem[]; count: number }> {
     const match = {};
@@ -15,6 +16,14 @@ class ItemService {
   }
   async getItemById(id: string): Promise<IItem | null> {
     return Item.findById(id).lean<IItem | null>();
+  }
+  async getFeaturedItems(excludeId: string, pageSize: number): Promise<IItem[] | []> {
+    const randomDocs: IItem[] | [] = await Item.aggregate([
+      { $match: { _id: { $ne: toObjectId(excludeId) } } },
+      { $sample: { size: pageSize } },
+    ]);
+
+    return randomDocs;
   }
 }
 

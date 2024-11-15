@@ -93,3 +93,16 @@ export const getItemByIdSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Item id is required.'),
 ];
+
+export const getFeaturedItemsByIdSchema = [
+  query('excludeId')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+  query('pageSize')
+    .exists({ checkFalsy: true })
+    .withMessage('Page size is required.')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Page size must be exactly 4 characters long.'),
+];
