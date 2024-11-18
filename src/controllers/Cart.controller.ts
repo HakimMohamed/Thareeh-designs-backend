@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import CartService from '../services/cart';
-import ItemService from '../services/item';
+import CartService from '../services/Cart.service';
+import ItemService from '../services/Item.service';
 import { CreateOrUpdateDto } from '../dtos/cart.dto';
 import { CreateOrUpdateCartResponse } from '../types/cart';
 import { IItem } from '../models/Item';

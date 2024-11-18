@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { GetItemByIdQueryParams, GetItemsQueryParams } from '../types/query-parameters';
 import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
-import ItemService from '../services/item';
+import ItemService from '../services/Item.service';
 import { FeaturedItemsDto } from '../dtos/items.dto';
 
 export async function getItems(

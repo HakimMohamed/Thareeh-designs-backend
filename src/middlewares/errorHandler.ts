@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import LoggingService from '../services/logs';
+import LoggingService from '../services/Log.service';
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   const logginService = LoggingService.getInstance();

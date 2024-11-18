@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { ObjectId } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import createEmailTransporter from '../config/nodeMailer';
-import LoggingService from './logs';
+import LoggingService from './Log.service';
 import { toObjectId, formatEgyptianTime } from '../utils/helpers';
 
 class UserService {

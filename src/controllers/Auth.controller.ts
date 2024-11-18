@@ -15,7 +15,7 @@ import {
   RequestEmailOTPResponse,
   VerifyEmailResponse,
 } from '../types/auth';
-import AuthService from '../services/auth';
+import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
 import { formatEgyptianTime } from '../utils/helpers';
 
