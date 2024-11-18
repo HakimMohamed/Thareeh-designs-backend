@@ -1,5 +1,9 @@
+import { Request } from 'express';
 declare namespace Express {
   export interface Request {
-    user: string;
+    user?: {
+      userId: string;
+      [key: string]: any;
+    };
   }
 }

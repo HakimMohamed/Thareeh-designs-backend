@@ -1,5 +1,4 @@
 import User, { IUser } from '../models/User';
-import Log from '../models/Log';
 import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';

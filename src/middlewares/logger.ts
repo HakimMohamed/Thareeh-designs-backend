@@ -10,6 +10,10 @@ const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
     console.log(`${method} ${originalUrl} ${statusCode} - ${duration}ms`);
   });
 
+  res.on('error', (error: any) => {
+    console.error('asdasdasd');
+  });
+
   next();
 };
 
