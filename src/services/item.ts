@@ -17,6 +17,11 @@ class ItemService {
   async getItemById(id: string): Promise<IItem | null> {
     return Item.findById(id).lean<IItem | null>();
   }
+  async getItemsByIds(items: string[]): Promise<IItem[] | null> {
+    const ids = items.map(id => toObjectId(id));
+
+    return Item.find({ _id: { $in: ids } }).lean<IItem[] | null>();
+  }
   async getFeaturedItems(excludeId: string, pageSize: number): Promise<IItem[] | []> {
     const randomDocs: IItem[] | [] = await Item.aggregate([
       { $match: { _id: { $ne: toObjectId(excludeId) } } },

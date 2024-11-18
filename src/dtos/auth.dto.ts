@@ -20,11 +20,6 @@ export interface LoginDto {
   password: string;
 }
 
-export interface FeaturedItemsDto {
-  pageSize?: string;
-  excludeId?: string;
-}
-
 export interface RefreshTokenDto {
   refreshToken: string;
 }

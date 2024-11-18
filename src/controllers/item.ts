@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { GetItemByIdQueryParams, GetItemsQueryParams } from '../types/query-parameters';
 import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
 import ItemService from '../services/item';
-import { FeaturedItemsDto } from '../dtos/auth.dto';
+import { FeaturedItemsDto } from '../dtos/items.dto';
 
 export async function getItems(
   req: Request<{}, {}, {}, GetItemsQueryParams>,
@@ -45,7 +45,7 @@ export async function getItemById(
 }
 
 export async function getFeaturedItems(
-  req: Request,
+  req: Request<FeaturedItemsDto>,
   res: Response<GetFeaturedItemsResponse>,
   next: NextFunction
 ): Promise<void> {

@@ -1,7 +1,4 @@
-export interface BaseResponse {
-  message: string;
-  success: boolean;
-}
+import { BaseResponse } from './response';
 
 export interface AuthDataResponse extends BaseResponse {
   data: null;

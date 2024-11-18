@@ -106,3 +106,7 @@ export const getFeaturedItemsByIdSchema = [
     .isLength({ min: 1, max: 100 })
     .withMessage('Page size must be exactly 4 characters long.'),
 ];
+
+export const createOrUpdateCartSchema = [
+  body('items').isArray().withMessage('Items must be an array.'),
+];
