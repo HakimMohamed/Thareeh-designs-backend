@@ -6,7 +6,7 @@ import {
   completeRegsitration,
   logout,
   verifyEmail,
-} from '../controllers/auth';
+} from '../controllers/Auth.controller';
 import {
   registerSchema,
   loginSchema,

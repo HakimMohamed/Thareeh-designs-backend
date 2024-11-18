@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getFeaturedItems, getItemById, getItems } from '../controllers/item';
+import { getFeaturedItems, getItemById, getItems } from '../controllers/Item.controller';
 import {
   getFeaturedItemsByIdSchema,
   getItemByIdSchema,
