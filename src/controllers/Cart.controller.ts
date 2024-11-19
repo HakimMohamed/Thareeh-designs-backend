@@ -15,9 +15,9 @@ export async function createOrUpdateCart(
   const userId = req.user?.userId!;
 
   try {
-    const fetchedItem: IItem[] | null = await ItemService.getItemsByIds(items);
+    const fetchedItems: IItem[] | null = await ItemService.getItemsByIds(items);
 
-    if (!fetchedItem) {
+    if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
       res.status(404).send({
         message: 'Something went wrong while adding item to cart.',
         data: null,
@@ -26,7 +26,7 @@ export async function createOrUpdateCart(
       return;
     }
 
-    await CartService.createOrUpdateCart(fetchedItem, userId);
+    await CartService.createOrUpdateCart(fetchedItems, userId);
 
     res.status(200).send({
       message: `Items fetched successfully.`,
