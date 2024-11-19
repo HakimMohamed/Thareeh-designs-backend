@@ -1,3 +1,3 @@
 export interface CreateOrUpdateDto {
-  item: string;
+  items: string[];
 }

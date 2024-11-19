@@ -15,10 +15,11 @@ class ItemService {
 
     return { items, count };
   }
+
   async getItemById(id: string): Promise<IItem | null> {
     return Item.findById(id).lean<IItem | null>();
   }
-  async getItemsByIds(itemsIds: ObjectId[]): Promise<IItem[] | null> {
+  async getItemsByIds(itemsIds: String[]): Promise<IItem[] | null> {
     return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();
   }
   async getFeaturedItems(excludeId: string, pageSize: number): Promise<IItem[] | []> {

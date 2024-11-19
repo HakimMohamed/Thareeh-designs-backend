@@ -4,7 +4,7 @@ import { toObjectId } from '../utils/helpers';
 import { DeleteResult, UpdateResult } from 'mongoose';
 
 class CartService {
-  async createOrUpdateCart(item: IItem, userId: string): Promise<UpdateResult> {
+  async createOrUpdateCart(items: IItem[], userId: string): Promise<UpdateResult> {
     const match: any = {
       _user: toObjectId(userId),
       status: 'active',
@@ -13,10 +13,10 @@ class CartService {
     return Cart.updateOne(
       match,
       {
-        $push: { items: item._id },
         $set: {
           status: 'active',
           _user: toObjectId(userId),
+          items: items.map((item: IItem) => item._id),
         },
       },
       { upsert: true }

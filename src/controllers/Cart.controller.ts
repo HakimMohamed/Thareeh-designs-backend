@@ -11,11 +11,11 @@ export async function createOrUpdateCart(
   res: Response<CreateOrUpdateCartResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { item } = req.body;
+  const { items } = req.body;
   const userId = req.user?.userId!;
 
   try {
-    const fetchedItem: IItem | null = await ItemService.getItemById(item);
+    const fetchedItem: IItem[] | null = await ItemService.getItemsByIds(items);
 
     if (!fetchedItem) {
       res.status(404).send({
@@ -70,3 +70,8 @@ export async function getUserCart(
     next(error);
   }
 }
+
+// add item to cart
+// remove item from cart
+// add quantity
+// remove cart
