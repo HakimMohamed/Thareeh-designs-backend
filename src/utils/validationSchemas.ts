@@ -114,3 +114,13 @@ export const createOrUpdateCartSchema = [
     .isArray({ min: 1, max: 100 })
     .withMessage('Items must be an array of at least 1 item and at most 100 items.'),
 ];
+
+export const addItemToCartSchema = [
+  body('item')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+];

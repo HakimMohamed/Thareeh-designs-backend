@@ -17,7 +17,7 @@ class ItemService {
   }
 
   async getItemById(id: string): Promise<IItem | null> {
-    return Item.findById(id).lean<IItem | null>();
+    return Item.find({ _id: toObjectId(id) }).lean<IItem | null>();
   }
   async getItemsByIds(itemsIds: String[]): Promise<IItem[] | null> {
     return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();

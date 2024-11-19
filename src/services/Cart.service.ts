@@ -1,7 +1,7 @@
 import Cart, { ICart, IFormattedCart } from '../models/Cart';
 import { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
-import { DeleteResult, UpdateResult } from 'mongoose';
+import { DeleteResult, ObjectId, UpdateResult } from 'mongoose';
 
 class CartService {
   async createOrUpdateCart(items: IItem[], userId: string): Promise<UpdateResult> {
@@ -21,6 +21,19 @@ class CartService {
       },
       { upsert: true }
     );
+  }
+
+  async addItemToCart(item: IItem, cartId: ObjectId): Promise<UpdateResult> {
+    const match: any = {
+      _cart: cartId,
+      status: 'active',
+    };
+
+    return Cart.updateOne(match, {
+      $push: {
+        items: item._id,
+      },
+    });
   }
 
   async removeCart(userId: string): Promise<DeleteResult> {
