@@ -108,5 +108,9 @@ export const getFeaturedItemsByIdSchema = [
 ];
 
 export const createOrUpdateCartSchema = [
-  body('items').isArray().withMessage('Items must be an array.'),
+  body('item')
+    .isMongoId()
+    .withMessage(' Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
 ];

@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import Item, { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
 class ItemService {
@@ -17,10 +18,8 @@ class ItemService {
   async getItemById(id: string): Promise<IItem | null> {
     return Item.findById(id).lean<IItem | null>();
   }
-  async getItemsByIds(items: string[]): Promise<IItem[] | null> {
-    const ids = items.map(id => toObjectId(id));
-
-    return Item.find({ _id: { $in: ids } }).lean<IItem[] | null>();
+  async getItemsByIds(itemsIds: ObjectId[]): Promise<IItem[] | null> {
+    return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();
   }
   async getFeaturedItems(excludeId: string, pageSize: number): Promise<IItem[] | []> {
     const randomDocs: IItem[] | [] = await Item.aggregate([
@@ -29,6 +28,19 @@ class ItemService {
     ]);
 
     return randomDocs;
+  }
+  applyDiscountToItems(items: IItem[]): IItem[] {
+    return items.map(item => {
+      const discount = item.discount;
+
+      if (discount?.active && discount.value > 0) {
+        item.priceAfterDiscount = item.price - item.price * (discount.value / 100);
+      } else {
+        item.priceAfterDiscount = item.price;
+      }
+
+      return item;
+    });
   }
 }
 
