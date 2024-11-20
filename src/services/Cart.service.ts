@@ -10,17 +10,17 @@ class CartService {
       status: 'active',
     };
 
-    return Cart.updateOne(
-      match,
-      {
-        $set: {
-          status: 'active',
-          _user: toObjectId(userId),
-          items: items.map((item: IItem) => item._id),
-        },
+    return Cart.updateOne(match, {
+      $set: {
+        status: 'active',
+        _user: toObjectId(userId),
+        items: items.map(item => ({
+          _id: item._id,
+          name: item.name,
+          quantity: 1,
+        })),
       },
-      { upsert: true }
-    );
+    });
   }
 
   async addItemToCart(item: IItem, cartId: ObjectId): Promise<UpdateResult> {

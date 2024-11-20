@@ -9,10 +9,16 @@ export interface ICart extends Document {
   status: string;
 }
 
+export interface ICartItem {
+  _id: ObjectId;
+  name: string;
+  quantity: number;
+}
+
 export interface IFormattedCart {
   _id: ObjectId;
   _user: ObjectId;
-  items: IItem[];
+  items: ICartItem[];
   price: number;
   originalPrice: number;
   discountAmount: number;
@@ -27,9 +33,9 @@ const cartSchema: Schema = new Schema(
     },
     items: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item',
-        required: true,
+        _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true, default: 1 },
       },
     ],
     status: {

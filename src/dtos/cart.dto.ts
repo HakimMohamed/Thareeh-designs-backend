@@ -1,5 +1,7 @@
+import { ICartItem } from '../models/Cart';
+
 export interface CreateOrUpdateDto {
-  items: string[];
+  items: ICartItem[];
 }
 
 export interface AddItemToCartDto {

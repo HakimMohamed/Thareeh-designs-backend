@@ -4,7 +4,7 @@ import ItemService from '../services/Item.service';
 import { AddItemToCartDto, CreateOrUpdateDto } from '../dtos/cart.dto';
 import { AddItemToCartResponse, CreateOrUpdateCartResponse } from '../types/cart';
 import { IItem } from '../models/Item';
-import { IFormattedCart } from '../models/Cart';
+import { ICartItem, IFormattedCart } from '../models/Cart';
 
 export async function createOrUpdateCart(
   req: Request<{}, {}, CreateOrUpdateDto>,
@@ -15,7 +15,9 @@ export async function createOrUpdateCart(
   const userId = req.user?.userId!;
 
   try {
-    const fetchedItems: IItem[] | null = await ItemService.getItemsByIds(items);
+    const itemsIds = items.map((item: ICartItem) => item._id.toString());
+
+    const fetchedItems: IItem[] | null = await ItemService.getItemsByIds(itemsIds);
 
     if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
       res.status(404).send({
@@ -115,8 +117,3 @@ export async function addItemToCart(
     next(error);
   }
 }
-
-// add item to cart
-// remove item from cart
-// add quantity
-// remove cart
