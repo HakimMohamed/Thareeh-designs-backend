@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongoose';
 import Item, { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
+import { ICartItem } from '../models/Cart';
 class ItemService {
   async getItems(page: number, pageSize: number): Promise<{ items: IItem[]; count: number }> {
     const match = {};
@@ -29,19 +30,6 @@ class ItemService {
     ]);
 
     return randomDocs;
-  }
-  applyDiscountToItems(items: IItem[]): IItem[] {
-    return items.map(item => {
-      const discount = item.discount;
-
-      if (discount?.active && discount.value > 0) {
-        item.priceAfterDiscount = item.price - item.price * (discount.value / 100);
-      } else {
-        item.priceAfterDiscount = item.price;
-      }
-
-      return item;
-    });
   }
 }
 

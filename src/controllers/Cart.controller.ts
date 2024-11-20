@@ -50,18 +50,29 @@ export async function getUserCart(
   try {
     const cart = await CartService.getUserCart(userId);
 
-    if (!cart || cart.items.length === 0) {
-      res.status(200).send({
-        message: 'Cart is empty.',
+    if (!cart || cart?.items?.length === 0) {
+      res.status(404).send({
+        message: 'Something went wrong while fetching cart.',
         data: null,
         success: false,
       });
       return;
     }
 
-    const discountItems = ItemService.applyDiscountToItems(cart.items as IItem[]);
+    const fetchedItems = await ItemService.getItemsByIds(
+      cart.items.map((item: ICartItem) => item._id.toString())
+    );
 
-    const formattedCart: IFormattedCart = await CartService.formatCart(cart, discountItems);
+    if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
+      res.status(404).send({
+        message: 'Items not found.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    const formattedCart: IFormattedCart = CartService.formatCart(cart, fetchedItems);
 
     res.status(200).send({
       message: `Cart fetched successfully.`,

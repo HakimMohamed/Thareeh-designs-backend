@@ -40,56 +40,50 @@ class CartService {
     return Cart.deleteOne({ _user: toObjectId(userId) });
   }
   async getUserCart(userId: string): Promise<ICart | null> {
-    const pipeline = [
-      {
-        $match: {
-          _user: toObjectId(userId),
-        },
-      },
-      {
-        $lookup: {
-          from: 'Items',
-          localField: 'items',
-          foreignField: '_id',
-          as: 'items',
-        },
-      },
-    ];
-
-    const cartWithItems = await Cart.aggregate<ICart>(pipeline);
-
-    return cartWithItems.length > 0 ? cartWithItems[0] : null;
+    return Cart.findOne({ _user: toObjectId(userId) }).lean<ICart | null>();
   }
 
   formatCart(cart: ICart, items: IItem[]): IFormattedCart {
     const formattedCart: IFormattedCart = {
       _id: cart._id,
       _user: cart._user,
-      items,
+      items: [],
       originalPrice: 0,
       price: 0,
-      discountAmount: 0,
     };
 
-    const { originalPrice, price, discountAmount } = items.reduce(
-      (acc, item) => {
-        const priceAfterDiscount = item?.priceAfterDiscount || item.price;
-        acc.originalPrice += item.price;
-        acc.price += priceAfterDiscount;
-        acc.discountAmount += item.price - priceAfterDiscount;
-        return acc;
-      },
-      { originalPrice: 0, price: 0, discountAmount: 0 }
-    );
+    const cartItemsMap = new Map(cart.items.map(item => [item._id.toString(), item]));
 
-    formattedCart.originalPrice = originalPrice;
-    formattedCart.price = price;
-    formattedCart.discountAmount = discountAmount;
+    items.forEach((item: IItem) => {
+      const cartItem = cartItemsMap.get(item._id.toString());
+
+      if (!cartItem) {
+        return null;
+      }
+
+      const originalTotalPrice = item.price * cartItem.quantity;
+
+      if (item.discount?.active && item.discount.value > 0) {
+        item.price = Math.max(
+          originalTotalPrice - originalTotalPrice * (item.discount.value / 100),
+          0
+        );
+      }
+
+      formattedCart.originalPrice += originalTotalPrice;
+      formattedCart.price += item.price;
+
+      formattedCart.items.push({
+        _id: item._id,
+        name: item.name,
+        quantity: cartItem.quantity,
+        price: item.price,
+        originalPrice: originalTotalPrice,
+      });
+    });
 
     return formattedCart;
   }
-
-  async calculateCartPrice(items: IItem[]): Promise<void> {}
 }
 
 export default new CartService();

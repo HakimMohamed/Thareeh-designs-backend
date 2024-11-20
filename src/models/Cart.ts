@@ -5,7 +5,7 @@ import { IItem } from './Item';
 export interface ICart extends Document {
   _id: ObjectId;
   _user: ObjectId;
-  items: ObjectId[] | IItem[];
+  items: ICartItem[];
   status: string;
 }
 
@@ -18,10 +18,15 @@ export interface ICartItem {
 export interface IFormattedCart {
   _id: ObjectId;
   _user: ObjectId;
-  items: ICartItem[];
+  items: {
+    _id: ObjectId;
+    name: string;
+    quantity: number;
+    originalPrice: number;
+    price: number;
+  }[];
   price: number;
   originalPrice: number;
-  discountAmount: number;
 }
 
 const cartSchema: Schema = new Schema(
