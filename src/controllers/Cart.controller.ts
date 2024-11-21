@@ -76,7 +76,7 @@ export async function getUserCart(
       return;
     }
 
-    const formattedCart: IFormattedCart = CartService.formatCart(cart, fetchedItems);
+    const formattedCart = CartService.formatCart(cart, fetchedItems);
 
     res.status(200).send({
       message: `Cart fetched successfully.`,
