@@ -7,3 +7,7 @@ export interface CreateOrUpdateDto {
 export interface AddItemToCartDto {
   itemId: string;
 }
+
+export interface RemoveItemFromCartDto {
+  itemId: string;
+}

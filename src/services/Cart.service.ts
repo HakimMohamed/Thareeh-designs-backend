@@ -1,7 +1,7 @@
 import Cart, { ICart, ICartItem, IFormattedCart } from '../models/Cart';
 import { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
-import { DeleteResult, ObjectId, UpdateResult } from 'mongoose';
+import { DeleteResult, UpdateResult } from 'mongoose';
 
 class CartService {
   async createOrUpdateCart(
@@ -120,6 +120,12 @@ class CartService {
     });
 
     return formattedCart;
+  }
+  async removeItemFromCart(itemId: string, userId: string): Promise<UpdateResult> {
+    return Cart.updateOne(
+      { _user: toObjectId(userId), status: 'active' },
+      { $pull: { items: { _id: toObjectId(itemId) } } }
+    );
   }
 }
 

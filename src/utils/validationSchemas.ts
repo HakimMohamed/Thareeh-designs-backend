@@ -116,7 +116,17 @@ export const createOrUpdateCartSchema = [
 ];
 
 export const addItemToCartSchema = [
-  body('item')
+  body('itemId')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+];
+
+export const removeItemFromCartSchema = [
+  body('itemId')
     .exists({ checkFalsy: true })
     .withMessage('Item is required.')
     .isMongoId()

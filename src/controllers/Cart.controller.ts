@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
-import { AddItemToCartDto, CreateOrUpdateDto } from '../dtos/cart.dto';
-import { AddItemToCartResponse, CreateOrUpdateCartResponse } from '../types/cart';
+import { AddItemToCartDto, CreateOrUpdateDto, RemoveItemFromCartDto } from '../dtos/cart.dto';
+import { CreateOrUpdateCartResponse } from '../types/cart';
 import { IItem } from '../models/Item';
 import { ICartItem, IFormattedCart } from '../models/Cart';
 
@@ -86,7 +86,7 @@ export async function getUserCart(
 
 export async function addItemToCart(
   req: Request<{}, {}, AddItemToCartDto>,
-  res: Response<AddItemToCartResponse>,
+  res: Response,
   next: NextFunction
 ): Promise<void> {
   const { itemId } = req.body;
@@ -117,6 +117,27 @@ export async function addItemToCart(
 
     res.status(200).send({
       message: `Item added successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function removeItemFromCart(
+  req: Request<{}, {}, RemoveItemFromCartDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { itemId } = req.body;
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.removeItemFromCart(itemId, userId);
+
+    res.status(200).send({
+      message: `Item removed successfully.`,
       data: null,
       success: true,
     });
