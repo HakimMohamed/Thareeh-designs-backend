@@ -7,7 +7,17 @@ class ItemService {
     const match = {};
 
     const [items, count]: [IItem[], number] = await Promise.all([
-      Item.find(match)
+      Item.find(match, {
+        name: 1,
+        price: 1,
+        description: 1,
+        image: 1,
+        category: 1,
+        discount: {
+          'discount.value': { $ifNull: ['$discount.value', 0] },
+          'discount.active': { $ifNull: ['$discount.active', false] },
+        },
+      })
         .skip(pageSize * (page - 1))
         .limit(pageSize)
         .lean<IItem[]>(),
@@ -18,7 +28,7 @@ class ItemService {
   }
 
   async getItemById(id: string): Promise<IItem | null> {
-    return Item.find({ _id: toObjectId(id) }).lean<IItem | null>();
+    return Item.findOne({ _id: toObjectId(id) }).lean<IItem | null>();
   }
   async getItemsByIds(itemsIds: String[]): Promise<IItem[] | null> {
     return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();
