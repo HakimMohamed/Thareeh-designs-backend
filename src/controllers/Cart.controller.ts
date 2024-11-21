@@ -145,3 +145,23 @@ export async function removeItemFromCart(
     next(error);
   }
 }
+
+export async function clearUserCart(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.clearUserCart(userId);
+
+    res.status(200).send({
+      message: `Cart cleared successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}

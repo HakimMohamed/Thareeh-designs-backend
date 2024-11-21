@@ -127,6 +127,10 @@ class CartService {
       { $pull: { items: { _id: toObjectId(itemId) } } }
     );
   }
+
+  async clearUserCart(userId: string): Promise<DeleteResult> {
+    return Cart.deleteOne({ _user: toObjectId(userId) });
+  }
 }
 
 export default new CartService();
