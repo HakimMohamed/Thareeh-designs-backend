@@ -1,10 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
-import { AddItemToCartDto, CreateOrUpdateDto } from '../dtos/cart.dto';
-import { AddItemToCartResponse, CreateOrUpdateCartResponse } from '../types/cart';
-import { IItem } from '../models/Item';
-import { IFormattedCart } from '../models/Cart';
+import {
+  AddItemToCartDto,
+  CreateOrUpdateDto,
+  RemoveItemFromCartDto,
+  UpdateItemQuantityDto,
+} from '../dtos/cart.dto';
+import { CreateOrUpdateCartResponse } from '../types/cart';
+import { ICartItem, IFormattedCart } from '../models/Cart';
 
 export async function createOrUpdateCart(
   req: Request<{}, {}, CreateOrUpdateDto>,
@@ -15,7 +19,9 @@ export async function createOrUpdateCart(
   const userId = req.user?.userId!;
 
   try {
-    const fetchedItems: IItem[] | null = await ItemService.getItemsByIds(items);
+    const itemsIds = items.map((item: ICartItem) => item._id.toString());
+
+    const fetchedItems = await ItemService.getItemsByIds(itemsIds);
 
     if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
       res.status(404).send({
@@ -26,7 +32,7 @@ export async function createOrUpdateCart(
       return;
     }
 
-    await CartService.createOrUpdateCart(fetchedItems, userId);
+    await CartService.createOrUpdateCart(fetchedItems, userId, items);
 
     res.status(200).send({
       message: `Items fetched successfully.`,
@@ -48,18 +54,29 @@ export async function getUserCart(
   try {
     const cart = await CartService.getUserCart(userId);
 
-    if (!cart || cart.items.length === 0) {
-      res.status(200).send({
-        message: 'Cart is empty.',
+    if (!cart || cart?.items?.length === 0) {
+      res.status(404).send({
+        message: 'Something went wrong while fetching cart.',
         data: null,
         success: false,
       });
       return;
     }
 
-    const discountItems = ItemService.applyDiscountToItems(cart.items as IItem[]);
+    const fetchedItems = await ItemService.getItemsByIds(
+      cart.items.map((item: ICartItem) => item._id.toString())
+    );
 
-    const formattedCart: IFormattedCart = await CartService.formatCart(cart, discountItems);
+    if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
+      res.status(404).send({
+        message: 'Items not found.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    const formattedCart = CartService.formatCart(cart, fetchedItems);
 
     res.status(200).send({
       message: `Cart fetched successfully.`,
@@ -73,19 +90,19 @@ export async function getUserCart(
 
 export async function addItemToCart(
   req: Request<{}, {}, AddItemToCartDto>,
-  res: Response<AddItemToCartResponse>,
+  res: Response,
   next: NextFunction
 ): Promise<void> {
-  const { item } = req.body;
+  const { itemId } = req.body;
   const userId = req.user?.userId!;
 
   try {
-    const [fetchedItem, cart] = await Promise.all([
-      ItemService.getItemById(item),
+    const [item, cart] = await Promise.all([
+      ItemService.getItemById(itemId),
       CartService.getUserCart(userId),
     ]);
 
-    if (!fetchedItem) {
+    if (!item) {
       res.status(404).send({
         message: 'Something went wrong while adding item to cart.',
         data: null,
@@ -94,17 +111,13 @@ export async function addItemToCart(
       return;
     }
 
-    if (!cart) {
-      await CartService.createOrUpdateCart([fetchedItem], userId);
-      res.status(200).send({
-        message: `Item added successfully.`,
-        data: null,
-        success: true,
-      });
-      return;
+    if (!cart || cart?.items?.length === 0) {
+      await CartService.createOrUpdateCart([item], userId, [
+        { _id: item._id, name: item.name, quantity: 1 },
+      ]);
+    } else {
+      await CartService.addItemToCart(item, userId, cart.items);
     }
-
-    await CartService.addItemToCart(fetchedItem, cart._id);
 
     res.status(200).send({
       message: `Item added successfully.`,
@@ -116,7 +129,64 @@ export async function addItemToCart(
   }
 }
 
-// add item to cart
-// remove item from cart
-// add quantity
-// remove cart
+export async function removeItemFromCart(
+  req: Request<{}, {}, RemoveItemFromCartDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { itemId } = req.body;
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.removeItemFromCart(itemId, userId);
+
+    res.status(200).send({
+      message: `Item removed successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function clearUserCart(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.clearUserCart(userId);
+
+    res.status(200).send({
+      message: `Cart cleared successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function updateItemQuantity(
+  req: Request<{}, {}, UpdateItemQuantityDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { itemId, quantity } = req.body;
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.updateCartItemQuantity(itemId, quantity, userId);
+
+    res.status(200).send({
+      message: `Cart cleared successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}

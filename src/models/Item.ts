@@ -1,12 +1,12 @@
-import { Schema, model, Document, NumberExpression } from 'mongoose';
+import { Schema, model, Document, NumberExpression, ObjectId } from 'mongoose';
 
 export interface IItem extends Document {
+  _id: ObjectId;
   name: string;
   price: number;
   description: string;
   image: string;
   category: string;
-  priceAfterDiscount?: number;
   discount?: {
     active: boolean;
     value: number;

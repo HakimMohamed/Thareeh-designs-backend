@@ -5,17 +5,28 @@ import { IItem } from './Item';
 export interface ICart extends Document {
   _id: ObjectId;
   _user: ObjectId;
-  items: ObjectId[] | IItem[];
+  items: ICartItem[];
   status: string;
+}
+
+export interface ICartItem {
+  _id: ObjectId;
+  name: string;
+  quantity: number;
 }
 
 export interface IFormattedCart {
   _id: ObjectId;
   _user: ObjectId;
-  items: IItem[];
+  items: {
+    _id: ObjectId;
+    name: string;
+    quantity: number;
+    originalPrice: number;
+    price: number;
+  }[];
   price: number;
   originalPrice: number;
-  discountAmount: number;
 }
 
 const cartSchema: Schema = new Schema(
@@ -27,9 +38,9 @@ const cartSchema: Schema = new Schema(
     },
     items: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item',
-        required: true,
+        _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true, default: 1 },
       },
     ],
     status: {
