@@ -131,6 +131,17 @@ class CartService {
   async clearUserCart(userId: string): Promise<DeleteResult> {
     return Cart.deleteOne({ _user: toObjectId(userId) });
   }
+
+  async updateCartItemQuantity(
+    itemId: string,
+    quantity: number,
+    userId: string
+  ): Promise<UpdateResult> {
+    return Cart.updateOne(
+      { _user: toObjectId(userId), status: 'active', 'items._id': toObjectId(itemId) },
+      { $set: { 'items.$.quantity': quantity } }
+    );
+  }
 }
 
 export default new CartService();

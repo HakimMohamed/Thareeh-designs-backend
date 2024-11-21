@@ -11,3 +11,8 @@ export interface AddItemToCartDto {
 export interface RemoveItemFromCartDto {
   itemId: string;
 }
+
+export interface UpdateItemQuantityDto {
+  itemId: string;
+  quantity: number;
+}

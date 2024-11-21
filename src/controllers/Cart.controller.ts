@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
-import { AddItemToCartDto, CreateOrUpdateDto, RemoveItemFromCartDto } from '../dtos/cart.dto';
+import {
+  AddItemToCartDto,
+  CreateOrUpdateDto,
+  RemoveItemFromCartDto,
+  UpdateItemQuantityDto,
+} from '../dtos/cart.dto';
 import { CreateOrUpdateCartResponse } from '../types/cart';
-import { IItem } from '../models/Item';
 import { ICartItem, IFormattedCart } from '../models/Cart';
 
 export async function createOrUpdateCart(
@@ -155,6 +159,27 @@ export async function clearUserCart(
 
   try {
     await CartService.clearUserCart(userId);
+
+    res.status(200).send({
+      message: `Cart cleared successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function updateItemQuantity(
+  req: Request<{}, {}, UpdateItemQuantityDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { itemId, quantity } = req.body;
+  const userId = req.user?.userId!;
+
+  try {
+    await CartService.updateCartItemQuantity(itemId, quantity, userId);
 
     res.status(200).send({
       message: `Cart cleared successfully.`,

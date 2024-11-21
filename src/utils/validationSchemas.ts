@@ -134,3 +134,19 @@ export const removeItemFromCartSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Item id is required.'),
 ];
+
+export const updateItemQuantitySchema = [
+  body('itemId')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+
+  body('quantity')
+    .exists({ checkFalsy: true })
+    .withMessage('Quantity is required.')
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Quantity must be an integer between 1 and 100.'),
+];
