@@ -1,37 +1,74 @@
-import Cart, { ICart, IFormattedCart } from '../models/Cart';
+import Cart, { ICart, ICartItem, IFormattedCart } from '../models/Cart';
 import { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
 import { DeleteResult, ObjectId, UpdateResult } from 'mongoose';
 
 class CartService {
-  async createOrUpdateCart(items: IItem[], userId: string): Promise<UpdateResult> {
+  async createOrUpdateCart(
+    items: IItem[],
+    userId: string,
+    cartItems: ICartItem[]
+  ): Promise<UpdateResult> {
+    const cartItemsMap = new Map(cartItems.map(item => [item._id.toString(), item]));
+
+    const formattedItems = items
+      .map(item => {
+        const cartItem = cartItemsMap.get(item._id.toString());
+
+        if (!cartItem) {
+          return null;
+        }
+
+        return {
+          _id: item._id,
+          name: item.name,
+          quantity: cartItem.quantity,
+        };
+      })
+      .filter(Boolean);
+
     const match: any = {
       _user: toObjectId(userId),
       status: 'active',
     };
 
-    return Cart.updateOne(match, {
-      $set: {
-        status: 'active',
-        _user: toObjectId(userId),
-        items: items.map(item => ({
+    return Cart.updateOne(
+      match,
+      {
+        $set: {
+          status: 'active',
+          _user: toObjectId(userId),
+          items: formattedItems,
+        },
+      },
+      { upsert: true }
+    );
+  }
+
+  async addItemToCart(item: IItem, userId: string, cartItems: ICartItem[]): Promise<UpdateResult> {
+    const match: any = {
+      _user: toObjectId(userId),
+      status: 'active',
+      'items._id': item._id,
+    };
+
+    const formattedItems: ICartItem[] = [];
+
+    for (const cartItem of cartItems) {
+      if (cartItem._id.toString() === item._id.toString()) {
+        cartItem.quantity += 1;
+      } else {
+        cartItems.push({
           _id: item._id,
           name: item.name,
           quantity: 1,
-        })),
-      },
-    });
-  }
-
-  async addItemToCart(item: IItem, cartId: ObjectId): Promise<UpdateResult> {
-    const match: any = {
-      _cart: cartId,
-      status: 'active',
-    };
+        });
+      }
+    }
 
     return Cart.updateOne(match, {
-      $push: {
-        items: item._id,
+      $set: {
+        items: formattedItems,
       },
     });
   }

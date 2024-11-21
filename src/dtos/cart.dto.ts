@@ -5,5 +5,5 @@ export interface CreateOrUpdateDto {
 }
 
 export interface AddItemToCartDto {
-  item: string;
+  itemId: string;
 }
