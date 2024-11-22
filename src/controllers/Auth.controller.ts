@@ -178,7 +178,7 @@ export async function verifyEmail(
 
     await Promise.all(promises);
 
-    const { refreshToken, accessToken } = AuthService.generateTokens(user._id.toString());
+    const { refreshToken, accessToken } = AuthService.generateTokens(user._id.toString(), email);
 
     res.status(200).send({
       message: 'Email verified successfully.',
@@ -252,7 +252,7 @@ export async function refreshAccessToken(
       return;
     }
 
-    const newAccessToken = AuthService.generateAccessToken(user._id.toString());
+    const newAccessToken = AuthService.generateAccessToken(user._id.toString(), user.email);
 
     res.send({
       message: 'Access token refreshed successfully.',

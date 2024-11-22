@@ -26,7 +26,7 @@ class UserService {
       password: hashedPassword,
     }) as IUser;
 
-    const { accessToken, refreshToken } = this.generateTokens(user._id.toString());
+    const { accessToken, refreshToken } = this.generateTokens(user._id.toString(), email);
 
     user.refreshToken = refreshToken;
 
@@ -51,22 +51,25 @@ class UserService {
       return null;
     }
   }
-  generateTokens(userId: string): {
+  generateTokens(
+    userId: string,
+    email: string
+  ): {
     accessToken: string;
     refreshToken: string;
   } {
     return {
-      accessToken: this.generateAccessToken(userId),
-      refreshToken: this.generateRefreshToken(userId),
+      accessToken: this.generateAccessToken(userId, email),
+      refreshToken: this.generateRefreshToken(userId, email),
     };
   }
-  generateAccessToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  generateAccessToken(userId: string, email: string): string {
+    return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.JWT_EXPIRY,
     });
   }
-  generateRefreshToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  generateRefreshToken(userId: string, email: string): string {
+    return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     });
   }
