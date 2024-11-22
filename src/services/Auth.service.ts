@@ -17,16 +17,25 @@ class UserService {
   }
   async register(
     email: string,
-    password: string
+    password: string,
+    firstName: string,
+    lastName: string
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       email,
+      firstName,
+      lastName,
       password: hashedPassword,
     }) as IUser;
 
-    const { accessToken, refreshToken } = this.generateTokens(user._id.toString(), email);
+    const { accessToken, refreshToken } = this.generateTokens(
+      user._id.toString(),
+      email,
+      firstName,
+      lastName
+    );
 
     user.refreshToken = refreshToken;
 
@@ -53,22 +62,24 @@ class UserService {
   }
   generateTokens(
     userId: string,
-    email: string
+    email: string,
+    firstName: string,
+    lastName: string
   ): {
     accessToken: string;
     refreshToken: string;
   } {
     return {
-      accessToken: this.generateAccessToken(userId, email),
-      refreshToken: this.generateRefreshToken(userId, email),
+      accessToken: this.generateAccessToken(userId, email, firstName, lastName),
+      refreshToken: this.generateRefreshToken(userId, email, firstName, lastName),
     };
   }
-  generateAccessToken(userId: string, email: string): string {
+  generateAccessToken(userId: string, email: string, firstName: string, lastName: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.JWT_EXPIRY,
     });
   }
-  generateRefreshToken(userId: string, email: string): string {
+  generateRefreshToken(userId: string, email: string, firstName: string, lastName: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     });

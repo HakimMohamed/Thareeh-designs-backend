@@ -83,7 +83,7 @@ export async function completeRegsitration(
   res: Response<CompleteRegisterationSchema>,
   next: NextFunction
 ): Promise<void> {
-  const { email, password, otp } = req.body;
+  const { email, password, otp, firstName, lastName } = req.body;
 
   try {
     const existingUser = await AuthService.checkUserExistance(email);
@@ -123,7 +123,12 @@ export async function completeRegsitration(
       return;
     }
 
-    const { refreshToken, accessToken } = await AuthService.register(email, password);
+    const { refreshToken, accessToken } = await AuthService.register(
+      email,
+      password,
+      firstName,
+      lastName
+    );
 
     await AuthService.verifyUserOtp(otpDoc._id);
 
@@ -198,7 +203,12 @@ export async function verifyEmail(
 
     await Promise.all(promises);
 
-    const { refreshToken, accessToken } = AuthService.generateTokens(user._id.toString(), email);
+    const { refreshToken, accessToken } = AuthService.generateTokens(
+      user._id.toString(),
+      email,
+      user.name.first,
+      user.name.last
+    );
 
     res.status(200).send({
       message: 'Email verified successfully.',
@@ -272,7 +282,12 @@ export async function refreshAccessToken(
       return;
     }
 
-    const newAccessToken = AuthService.generateAccessToken(user._id.toString(), user.email);
+    const newAccessToken = AuthService.generateAccessToken(
+      user._id.toString(),
+      user.email,
+      user.name.first,
+      user.name.last
+    );
 
     res.send({
       message: 'Access token refreshed successfully.',

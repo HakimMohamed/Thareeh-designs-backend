@@ -3,6 +3,8 @@ export interface RegisterDto {
 }
 export interface CompleteRegisterationDto {
   email: string;
+  firstName: string;
+  lastName: string;
   otp: string;
   password: string;
 }
