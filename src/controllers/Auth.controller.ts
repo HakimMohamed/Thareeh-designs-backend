@@ -10,14 +10,34 @@ import {
 import {
   AuthDataResponse,
   CompleteRegisterationSchema,
+  GetUserResponse,
   LogOutResponse,
   RefreshTokenResponse,
-  RequestEmailOTPResponse,
   VerifyEmailResponse,
 } from '../types/auth';
 import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
 import { formatEgyptianTime } from '../utils/helpers';
+
+export async function getUser(
+  req: Request,
+  res: Response<GetUserResponse>,
+  next: NextFunction
+): Promise<void> {
+  const userId = req.user?.userId!;
+
+  try {
+    const existingUser = await AuthService.getUserById(userId);
+
+    res.status(200).send({
+      message: `User fetched successfully.`,
+      data: existingUser,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
 
 export async function register(
   req: Request<{}, {}, RegisterDto>,

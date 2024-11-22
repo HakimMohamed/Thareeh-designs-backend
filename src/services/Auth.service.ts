@@ -83,7 +83,7 @@ class UserService {
     return User.findOne({ email }).lean<IUser | null>();
   }
   async getUserById(id: string): Promise<IUser | null> {
-    return User.findOne({ _id: toObjectId(id) }).lean<IUser | null>();
+    return User.findOne({ _id: toObjectId(id) }, { password: 0 }).lean<IUser | null>();
   }
   async validateUser(user: IUser, password: string): Promise<Boolean> {
     return bcrypt.compare(password, user.password);

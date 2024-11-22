@@ -1,7 +1,11 @@
+import { IUser } from '../models/User';
 import { BaseResponse } from './response';
 
 export interface AuthDataResponse extends BaseResponse {
   data: null;
+}
+export interface GetUserResponse extends BaseResponse {
+  data: IUser | null;
 }
 export interface CompleteRegisterationSchema extends BaseResponse {
   data: {

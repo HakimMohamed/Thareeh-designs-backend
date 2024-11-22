@@ -6,6 +6,7 @@ import {
   completeRegsitration,
   logout,
   verifyEmail,
+  getUser,
 } from '../controllers/Auth.controller';
 import {
   registerSchema,
@@ -21,6 +22,7 @@ const router = Router();
 // /api/auth
 
 router.post('/register', registerSchema, validateSchemaMiddlware, register);
+router.get('/user', getUser);
 router.post(
   '/complete-registeration',
   completeRegisterationSchema,
