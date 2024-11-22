@@ -50,8 +50,8 @@ export async function register(
     const existingUser = await AuthService.checkEmailExistance(email);
 
     if (existingUser) {
-      res.status(409).json({
-        message: 'Email number already in use.',
+      res.status(409).send({
+        message: 'Email already in use.',
         success: false,
         data: null,
       });
@@ -67,7 +67,7 @@ export async function register(
     });
   } catch (error: any) {
     if (error === 'Blocked For 10 minutes due to multiple failed attempts.') {
-      res.status(403).json({
+      res.status(403).send({
         message: error,
         success: false,
         data: null,
@@ -89,7 +89,7 @@ export async function completeRegsitration(
     const existingUser = await AuthService.checkUserExistance(email);
 
     if (existingUser) {
-      res.status(409).json({
+      res.status(409).send({
         message: 'Email already in use.',
         success: false,
         data: null,
@@ -104,7 +104,7 @@ export async function completeRegsitration(
     const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
 
     if (!otpDoc) {
-      res.status(410).json({
+      res.status(410).send({
         message: 'OTP expired.',
         success: false,
         data: null,
@@ -115,7 +115,7 @@ export async function completeRegsitration(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
-      res.status(403).json({
+      res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
         data: null,
@@ -142,7 +142,7 @@ export async function completeRegsitration(
     });
   } catch (error: any) {
     if (error && error.code === 'E11000') {
-      res.status(409).json({
+      res.status(409).send({
         message: 'Email already in use.',
         success: false,
         data: null,
@@ -178,7 +178,7 @@ export async function verifyEmail(
     const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
 
     if (!otpDoc) {
-      res.status(410).json({
+      res.status(410).send({
         message: 'OTP expired.',
         success: false,
         data: null,
@@ -189,7 +189,7 @@ export async function verifyEmail(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
-      res.status(403).json({
+      res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
         data: null,

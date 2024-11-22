@@ -7,11 +7,11 @@ const errorHandler = (err: any, req: Request, res: Response, next: NextFunction)
   logginService.logError(err, req);
 
   if (err.name === 'UnauthorizedError') {
-    res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).send({ message: 'Unauthorized' });
     return;
   }
 
-  res.status(500).json({
+  res.status(500).send({
     data: null,
     message: 'Internal Server Error',
     success: false,

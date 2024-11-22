@@ -145,7 +145,7 @@ class UserService {
 
     const otpDoc = await this.getUserOtpByDate({ email, date: formattedDate });
 
-    if (!otpDoc || (otpDoc && !(otpDoc.trials >= 4))) {
+    if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
       const otp = await this.generateOTP();
 
       this.sendOTPEmail(email, otp.toString()).catch(err => {
