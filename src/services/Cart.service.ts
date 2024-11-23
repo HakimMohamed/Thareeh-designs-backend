@@ -49,28 +49,44 @@ class CartService {
     const match: any = {
       _user: toObjectId(userId),
       status: 'active',
-      'items._id': item._id,
     };
 
-    const formattedItems: ICartItem[] = [];
+    let update = {};
 
-    for (const cartItem of cartItems) {
-      if (cartItem._id.toString() === item._id.toString()) {
-        cartItem.quantity += 1;
-      } else {
-        cartItems.push({
-          _id: item._id,
-          name: item.name,
-          quantity: 1,
-        });
-      }
+    const isItemInCart = cartItems.find(
+      cartItem => cartItem._id.toString() === item._id.toString()
+    );
+
+    if (!isItemInCart) {
+      update = {
+        $push: {
+          items: {
+            _id: item._id,
+            name: item.name,
+            quantity: 1,
+          },
+        },
+      };
+    } else {
+      const formattedItems = cartItems.map(cartItem => {
+        if (cartItem._id.toString() === item._id.toString()) {
+          return {
+            _id: cartItem._id,
+            name: cartItem.name,
+            quantity: cartItem.quantity + 1,
+          };
+        }
+        return cartItem;
+      });
+
+      update = {
+        $set: {
+          items: formattedItems,
+        },
+      };
     }
 
-    return Cart.updateOne(match, {
-      $set: {
-        items: formattedItems,
-      },
-    });
+    return Cart.updateOne(match, update);
   }
 
   async removeCart(userId: string): Promise<DeleteResult> {

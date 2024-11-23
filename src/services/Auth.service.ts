@@ -20,7 +20,7 @@ class UserService {
     password: string,
     firstName: string,
     lastName: string
-  ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; userId: ObjectId }> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -43,7 +43,7 @@ class UserService {
 
     await user.save();
 
-    return { accessToken, refreshToken, userId: user._id.toString() };
+    return { accessToken, refreshToken, userId: user._id };
   }
   async validateRefreshToken(refreshToken: string): Promise<IUser | null> {
     try {

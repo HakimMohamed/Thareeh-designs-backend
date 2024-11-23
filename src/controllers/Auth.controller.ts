@@ -17,7 +17,7 @@ import {
 } from '../types/auth';
 import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
-import { formatEgyptianTime } from '../utils/helpers';
+import { formatEgyptianTime, toObjectId } from '../utils/helpers';
 
 export async function getUser(
   req: Request,
@@ -130,7 +130,7 @@ export async function completeRegsitration(
       lastName
     );
 
-    await AuthService.verifyUserOtp(otpDoc._id);
+    await Promise.all([AuthService.verifyUserOtp(otpDoc._id), AuthService.verifyUser(userId)]);
 
     res.status(200).send({
       message: 'Register successful.',
@@ -138,7 +138,7 @@ export async function completeRegsitration(
         refreshToken,
         accessToken,
         user: {
-          userId,
+          userId: userId.toString(),
           email,
         },
       },
