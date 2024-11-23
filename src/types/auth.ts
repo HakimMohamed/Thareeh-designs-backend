@@ -11,6 +11,10 @@ export interface CompleteRegisterationSchema extends BaseResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    user: {
+      email: string;
+      userId: string;
+    };
   } | null;
 }
 export interface RequestEmailOTPResponse extends BaseResponse {

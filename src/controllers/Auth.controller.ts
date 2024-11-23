@@ -123,7 +123,7 @@ export async function completeRegsitration(
       return;
     }
 
-    const { refreshToken, accessToken } = await AuthService.register(
+    const { refreshToken, accessToken, userId } = await AuthService.register(
       email,
       password,
       firstName,
@@ -132,11 +132,15 @@ export async function completeRegsitration(
 
     await AuthService.verifyUserOtp(otpDoc._id);
 
-    res.send({
+    res.status(200).send({
       message: 'Register successful.',
       data: {
         refreshToken,
         accessToken,
+        user: {
+          userId,
+          email,
+        },
       },
       success: true,
     });
@@ -253,7 +257,7 @@ export async function login(
 
     await AuthService.sendOtp(email);
 
-    res.send({
+    res.status(200).send({
       message: `Otp sent to ${email}.`,
       data: null,
       success: true,
@@ -289,7 +293,7 @@ export async function refreshAccessToken(
       user.name.last
     );
 
-    res.send({
+    res.status(200).send({
       message: 'Access token refreshed successfully.',
       data: {
         accessToken: newAccessToken,

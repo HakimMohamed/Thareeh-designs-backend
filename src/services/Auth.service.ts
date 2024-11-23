@@ -20,13 +20,15 @@ class UserService {
     password: string,
     firstName: string,
     lastName: string
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       email,
-      firstName,
-      lastName,
+      name: {
+        first: firstName,
+        last: lastName,
+      },
       password: hashedPassword,
     }) as IUser;
 
@@ -41,7 +43,7 @@ class UserService {
 
     await user.save();
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user._id.toString() };
   }
   async validateRefreshToken(refreshToken: string): Promise<IUser | null> {
     try {
@@ -136,7 +138,7 @@ class UserService {
 
     match.email = email;
 
-    return UserOtp.findOne().lean<IUserOtp | null>();
+    return UserOtp.findOne().sort({ createdAt: -1 }).lean<IUserOtp | null>();
   }
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
