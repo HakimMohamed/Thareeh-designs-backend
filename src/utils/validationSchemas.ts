@@ -36,6 +36,18 @@ export const completeRegisterationSchema = [
     .withMessage('Otp is required.')
     .isLength({ min: 4, max: 4 })
     .withMessage('Otp must be exactly 4 characters long.'),
+
+  body('firstName')
+    .exists({ checkFalsy: true })
+    .withMessage('First name is required.')
+    .isLength({ max: 256 })
+    .withMessage('First name must be at most 256 characters long.'),
+
+  body('lastName')
+    .exists({ checkFalsy: true })
+    .withMessage('Last name is required.')
+    .isLength({ max: 256 })
+    .withMessage('Last name must be at most 256 characters long.'),
 ];
 export const loginSchema = [
   body('email')
