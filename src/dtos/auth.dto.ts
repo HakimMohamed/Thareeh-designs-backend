@@ -12,7 +12,7 @@ export interface RequestEmailOTPDto {
   email: string;
 }
 
-export interface VerifyEmailDto {
+export interface VerifyOtpDto {
   email: string;
   otp: string;
 }

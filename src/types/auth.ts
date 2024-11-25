@@ -17,9 +17,7 @@ export interface CompleteRegisterationSchema extends BaseResponse {
     };
   } | null;
 }
-export interface RequestEmailOTPResponse extends BaseResponse {
-  data: null;
-}
+
 export interface RefreshTokenResponse extends BaseResponse {
   data: {
     accessToken: string;
@@ -32,9 +30,10 @@ export interface LogOutResponse extends BaseResponse {
   } | null;
 }
 
-export interface VerifyEmailResponse extends BaseResponse {
+export interface VerifyOtpResponse extends BaseResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    user: IUser;
   } | null;
 }

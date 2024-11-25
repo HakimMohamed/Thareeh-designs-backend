@@ -69,7 +69,7 @@ export const requestEmailOTPSchema = [
     .isLength({ max: 256 })
     .withMessage('Email must be at most 256 characters long.'),
 ];
-export const verifyEmailSchema = [
+export const verifyOtpSchema = [
   body('email')
     .exists({ checkFalsy: true })
     .withMessage('Email is required.')

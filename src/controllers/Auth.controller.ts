@@ -5,7 +5,7 @@ import {
   RefreshTokenDto,
   CompleteRegisterationDto,
   LogoutDto,
-  VerifyEmailDto,
+  VerifyOtpDto,
 } from '../dtos/auth.dto';
 import {
   AuthDataResponse,
@@ -13,7 +13,7 @@ import {
   GetUserResponse,
   LogOutResponse,
   RefreshTokenResponse,
-  VerifyEmailResponse,
+  VerifyOtpResponse,
 } from '../types/auth';
 import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
@@ -157,9 +157,9 @@ export async function completeRegsitration(
   }
 }
 
-export async function verifyEmail(
-  req: Request<{}, {}, VerifyEmailDto>,
-  res: Response<VerifyEmailResponse>,
+export async function verifyOtp(
+  req: Request<{}, {}, VerifyOtpDto>,
+  res: Response<VerifyOtpResponse>,
   next: NextFunction
 ): Promise<void> {
   const { email, otp } = req.body;
@@ -219,6 +219,7 @@ export async function verifyEmail(
       data: {
         refreshToken,
         accessToken,
+        user,
       },
       success: true,
     });
