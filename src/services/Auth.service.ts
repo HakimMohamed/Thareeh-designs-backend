@@ -170,7 +170,7 @@ class UserService {
         }
       );
     } else {
-      return Promise.reject('Blocked For 10 minutes due to multiple failed attempts.');
+      throw new Error('Blocked For 10 minutes due to multiple failed attempts.');
     }
   }
   async verifyUserOtp(otpDocId: ObjectId): Promise<void> {

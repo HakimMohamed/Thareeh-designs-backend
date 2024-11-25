@@ -27,7 +27,7 @@ class LoggingService {
         : {};
 
       await new Log({
-        message: err.message,
+        message: err.message || 'Internal Server Error',
         stackTrace: err.stack,
         level: 'critical',
         request: requestData,

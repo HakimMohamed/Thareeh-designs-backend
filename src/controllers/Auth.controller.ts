@@ -66,7 +66,7 @@ export async function register(
       success: true,
     });
   } catch (error: any) {
-    if (error === 'Blocked For 10 minutes due to multiple failed attempts.') {
+    if (error.message === 'Blocked For 10 minutes due to multiple failed attempts.') {
       res.status(403).send({
         message: error,
         success: false,

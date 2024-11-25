@@ -3,7 +3,7 @@ const constants = {
   PUBLIC_ROUTES: [
     '/api/auth/login',
     '/api/auth/register',
-    '/api/auth/verify-email',
+    '/api/auth/otp/verify',
     '/api/auth/complete-registeration',
     '/api/auth/refresh-token',
     '/api/auth/logout',
