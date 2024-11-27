@@ -130,7 +130,10 @@ export async function completeRegsitration(
       lastName
     );
 
-    await Promise.all([AuthService.verifyUserOtp(otpDoc._id), AuthService.verifyUser(userId)]);
+    await Promise.all([
+      AuthService.verifyUserOtp(otpDoc._id),
+      AuthService.verifyUser(userId, refreshToken),
+    ]);
 
     res.status(200).send({
       message: 'Register successful.',
@@ -201,18 +204,17 @@ export async function verifyOtp(
       return;
     }
 
-    const promises = [AuthService.verifyUserOtp(otpDoc._id)];
-
-    if (!user.verified) promises.push(AuthService.verifyUser(user._id));
-
-    await Promise.all(promises);
-
     const { refreshToken, accessToken } = AuthService.generateTokens(
       user._id.toString(),
       email,
       user.name.first,
       user.name.last
     );
+
+    await Promise.all([
+      AuthService.verifyUserOtp(otpDoc._id),
+      AuthService.verifyUser(user._id, refreshToken),
+    ]);
 
     res.status(200).send({
       message: 'Email verified successfully.',

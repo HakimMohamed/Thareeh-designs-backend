@@ -24,6 +24,7 @@ export interface IFormattedCart {
     quantity: number;
     originalPrice: number;
     price: number;
+    image: string;
   }[];
   price: number;
   originalPrice: number;

@@ -3,7 +3,7 @@ import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { ObjectId } from 'mongoose';
+import { ObjectId, UpdateResult } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import createEmailTransporter from '../config/nodeMailer';
 import LoggingService from './Log.service';
@@ -176,8 +176,8 @@ class UserService {
   async verifyUserOtp(otpDocId: ObjectId): Promise<void> {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
-  async verifyUser(userId: ObjectId): Promise<void> {
-    await UserOtp.updateOne({ _id: userId }, { verified: true });
+  async verifyUser(userId: ObjectId, refreshToken: string): Promise<UpdateResult> {
+    return UserOtp.updateOne({ _id: userId }, { verified: true, refreshToken });
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {
     await User.updateOne({ _id: userId }, { refreshToken: '' });

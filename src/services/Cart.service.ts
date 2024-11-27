@@ -131,6 +131,7 @@ class CartService {
         name: item.name,
         quantity: cartItem.quantity,
         price: item.price,
+        image: item.image,
         originalPrice: originalTotalPrice,
       });
     });
