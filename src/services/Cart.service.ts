@@ -121,6 +121,8 @@ class CartService {
           originalTotalPrice - originalTotalPrice * (item.discount.value / 100),
           0
         );
+      } else {
+        item.price = originalTotalPrice;
       }
 
       formattedCart.originalPrice += originalTotalPrice;
@@ -132,6 +134,7 @@ class CartService {
         quantity: cartItem.quantity,
         price: item.price,
         image: item.image,
+        discount: item.discount,
         originalPrice: originalTotalPrice,
       });
     });

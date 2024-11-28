@@ -25,6 +25,10 @@ export interface IFormattedCart {
     originalPrice: number;
     price: number;
     image: string;
+    discount?: {
+      active: boolean;
+      value: number;
+    };
   }[];
   price: number;
   originalPrice: number;
