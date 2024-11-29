@@ -68,7 +68,7 @@ export async function register(
   } catch (error: any) {
     if (error.message === 'Blocked For 10 minutes due to multiple failed attempts.') {
       res.status(403).send({
-        message: error,
+        message: error.message,
         success: false,
         data: null,
       });
@@ -265,7 +265,15 @@ export async function login(
       data: null,
       success: true,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === 'Blocked For 10 minutes due to multiple failed attempts.') {
+      res.status(403).send({
+        message: error.message,
+        success: false,
+        data: null,
+      });
+      return;
+    }
     next(error);
   }
 }

@@ -138,7 +138,7 @@ class UserService {
 
     match.email = email;
 
-    return UserOtp.findOne().sort({ createdAt: -1 }).lean<IUserOtp | null>();
+    return UserOtp.findOne(match).sort({ createdAt: -1 }).lean<IUserOtp | null>();
   }
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
@@ -148,8 +148,8 @@ class UserService {
     const otpDoc = await this.getUserOtpByDate({ email, date: formattedDate });
 
     if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
-      const otp = await this.generateOTP();
-
+      const otp = this.generateOTP();
+      console.log(otp);
       this.sendOTPEmail(email, otp.toString()).catch(err => {
         const logger = LoggingService.getInstance();
         logger.logError(err);
