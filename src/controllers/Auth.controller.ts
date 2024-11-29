@@ -276,7 +276,6 @@ export async function refreshAccessToken(
   next: NextFunction
 ): Promise<void> {
   const { refreshToken } = req.body;
-
   try {
     const user = await AuthService.validateRefreshToken(refreshToken);
 
@@ -295,7 +294,6 @@ export async function refreshAccessToken(
       user.name.first,
       user.name.last
     );
-
     res.status(200).send({
       message: 'Access token refreshed successfully.',
       data: {

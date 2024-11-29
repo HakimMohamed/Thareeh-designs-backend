@@ -53,7 +53,7 @@ class UserService {
 
       const user = await User.findById(decoded.userId).lean();
 
-      if (!user || user.refreshToken !== refreshToken) {
+      if (user?.refreshToken !== refreshToken) {
         return null;
       }
 
@@ -177,7 +177,7 @@ class UserService {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
   async verifyUser(userId: ObjectId, refreshToken: string): Promise<UpdateResult> {
-    return UserOtp.updateOne({ _id: userId }, { verified: true, refreshToken });
+    return User.updateOne({ _id: userId }, { verified: true, refreshToken });
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {
     await User.updateOne({ _id: userId }, { refreshToken: '' });
