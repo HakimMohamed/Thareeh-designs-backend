@@ -3,10 +3,17 @@ import Item, { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
 import { ICartItem } from '../models/Cart';
 class ItemService {
-  async getItems(page: number, pageSize: number): Promise<{ items: IItem[]; count: number }> {
-    const match = {};
+  async getItems(
+    page: number,
+    pageSize: number,
+    categories: string[]
+  ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
+    const match: any = {};
 
-    const [items, count]: [IItem[], number] = await Promise.all([
+    if (categories && categories.length > 0) {
+      match.category = { $in: categories };
+    }
+    const [items, count, filters]: [IItem[], number, string[]] = await Promise.all([
       Item.find(match, {
         name: 1,
         price: 1,
@@ -22,9 +29,10 @@ class ItemService {
         .limit(pageSize)
         .lean<IItem[]>(),
       Item.countDocuments(match),
+      Item.distinct('category'),
     ]);
 
-    return { items, count };
+    return { items, count, filters };
   }
 
   async getItemById(id: string): Promise<IItem | null> {
