@@ -140,8 +140,6 @@ class UserService {
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
-    const formattedDate = formatEgyptianTime(tenMinutesAgo);
-
     const otpDoc = await this.getUserOtpByDate({ email });
 
     if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
