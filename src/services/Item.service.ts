@@ -44,7 +44,7 @@ class ItemService {
   async getFeaturedItems(
     pageSize: number,
     excludeId?: string,
-    cartItems?: ObjectId[] | []
+    cartItems?: string[] | []
   ): Promise<IItem[] | []> {
     let matchStage: any = {};
 
@@ -53,7 +53,7 @@ class ItemService {
     }
 
     if (cartItems && cartItems.length > 0) {
-      matchStage = { $match: { _id: { $nin: cartItems } } };
+      matchStage = { $match: { _id: { $nin: cartItems.map(item => toObjectId(item)) } } };
     }
 
     const randomDocs: IItem[] | [] = await Item.aggregate([

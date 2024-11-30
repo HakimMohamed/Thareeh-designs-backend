@@ -65,21 +65,13 @@ export async function getFeaturedItems(
   res: Response<GetFeaturedItemsResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { pageSize, excludeId } = req.query;
-
-  const userId = authenticateUser(req as any);
-
+  const { pageSize, excludeId, cartItems } = req.query;
+  const parsedCartItems = cartItems && cartItems.length > 0 ? JSON.parse(cartItems as string) : [];
   try {
-    const cartItems = userId
-      ? (await CartService.getUserUnformattedCart(userId))?.items?.map(
-          (item: ICartItem) => item._id
-        ) || []
-      : [];
-
     const items = await ItemService.getFeaturedItems(
       Number(pageSize),
       excludeId as string,
-      cartItems
+      parsedCartItems
     );
     res.status(200).send({
       message: `Items fetched successfully.`,
