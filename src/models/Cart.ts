@@ -1,6 +1,5 @@
 // models/User.ts
 import mongoose, { Document, ObjectId, Schema } from 'mongoose';
-import { IItem } from './Item';
 
 export interface ICart extends Document {
   _id: ObjectId;
@@ -58,6 +57,8 @@ const cartSchema: Schema = new Schema(
     timestamps: true,
   }
 );
+
+cartSchema.index({ _user: 'asc' });
 
 const Cart = mongoose.model<ICart>('Cart', cartSchema, 'Carts');
 

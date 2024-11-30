@@ -28,6 +28,8 @@ const itemsSchema = new Schema(
   { timestamps: true }
 );
 
+itemsSchema.index({ price: 'asc' });
+
 const ItemSchema = model<IItem>('Item', itemsSchema, 'Items');
 
 export default ItemSchema;

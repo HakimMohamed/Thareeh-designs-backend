@@ -64,6 +64,8 @@ const orderSchema: Schema = new Schema(
   }
 );
 
+orderSchema.index({ _user: 'asc' });
+
 const Order = mongoose.model<IOrder>('Order', orderSchema, 'Orders');
 
 export default Order;

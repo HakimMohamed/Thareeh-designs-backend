@@ -32,6 +32,8 @@ const userSchema: Schema = new Schema(
   }
 );
 
+userSchema.index({ email: 'asc' });
+
 const User = mongoose.model<IUser>('User', userSchema, 'Users');
 
 export default User;
