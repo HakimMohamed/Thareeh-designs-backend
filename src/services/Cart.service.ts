@@ -162,6 +162,10 @@ class CartService {
       { $set: { 'items.$.quantity': quantity } }
     );
   }
+
+  async getUserUnformattedCart(userId: string): Promise<ICart | null> {
+    return Cart.findOne({ _user: toObjectId(userId) }).lean<ICart | null>();
+  }
 }
 
 export default new CartService();

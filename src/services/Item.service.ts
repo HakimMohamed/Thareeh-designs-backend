@@ -41,9 +41,23 @@ class ItemService {
   async getItemsByIds(itemsIds: String[]): Promise<IItem[] | null> {
     return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();
   }
-  async getFeaturedItems(excludeId: string, pageSize: number): Promise<IItem[] | []> {
+  async getFeaturedItems(
+    pageSize: number,
+    excludeId?: string,
+    cartItems?: ObjectId[] | []
+  ): Promise<IItem[] | []> {
+    let matchStage: any = {};
+
+    if (excludeId) {
+      matchStage = { $match: { _id: { $ne: toObjectId(excludeId) } } };
+    }
+
+    if (cartItems && cartItems.length > 0) {
+      matchStage = { $match: { _id: { $nin: cartItems } } };
+    }
+
     const randomDocs: IItem[] | [] = await Item.aggregate([
-      { $match: { _id: { $ne: toObjectId(excludeId) } } },
+      matchStage,
       { $sample: { size: pageSize } },
     ]);
 

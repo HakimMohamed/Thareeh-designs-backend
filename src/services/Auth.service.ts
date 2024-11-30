@@ -149,7 +149,6 @@ class UserService {
 
     if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
       const otp = this.generateOTP();
-      console.log(otp);
       this.sendOTPEmail(email, otp.toString()).catch(err => {
         const logger = LoggingService.getInstance();
         logger.logError(err);

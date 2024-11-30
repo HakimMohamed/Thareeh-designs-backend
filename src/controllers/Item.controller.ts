@@ -1,8 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
-import { GetItemByIdQueryParams, GetItemsQueryParams } from '../types/query-parameters';
+import {
+  FeaturedItemsDto,
+  GetItemByIdQueryParams,
+  GetItemsQueryParams,
+} from '../types/query-parameters';
 import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
 import ItemService from '../services/Item.service';
-import { FeaturedItemsDto } from '../dtos/items.dto';
+import CartService from '../services/Cart.service';
+import { ICartItem } from '../models/Cart';
+import { authenticateUser } from '../utils/helpers';
 
 export async function getItems(
   req: Request<{}, {}, {}, GetItemsQueryParams>,
@@ -55,18 +61,29 @@ export async function getItemById(
 }
 
 export async function getFeaturedItems(
-  req: Request<FeaturedItemsDto>,
+  req: Request<{}, {}, {}, FeaturedItemsDto>,
   res: Response<GetFeaturedItemsResponse>,
   next: NextFunction
 ): Promise<void> {
   const { pageSize, excludeId } = req.query;
 
-  try {
-    const item = await ItemService.getFeaturedItems(excludeId as string, Number(pageSize));
+  const userId = authenticateUser(req as any);
 
+  try {
+    const cartItems = userId
+      ? (await CartService.getUserUnformattedCart(userId))?.items?.map(
+          (item: ICartItem) => item._id
+        ) || []
+      : [];
+
+    const items = await ItemService.getFeaturedItems(
+      Number(pageSize),
+      excludeId as string,
+      cartItems
+    );
     res.status(200).send({
       message: `Items fetched successfully.`,
-      data: item,
+      data: items,
       success: true,
     });
   } catch (error: any) {

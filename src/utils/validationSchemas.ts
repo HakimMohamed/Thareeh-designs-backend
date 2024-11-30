@@ -112,7 +112,7 @@ export const getFeaturedItemsByIdSchema = [
   query('excludeId')
     .isMongoId()
     .withMessage('Invalid item id.')
-    .exists({ checkFalsy: true })
+    .optional()
     .withMessage('Item id is required.'),
   query('pageSize')
     .exists({ checkFalsy: true })
