@@ -124,17 +124,14 @@ class UserService {
     await this.transporter.sendMail(mailOptions);
   }
 
-  async getUserOtpByDate({
-    email,
-    date,
-  }: {
-    email?: string;
-    date: Date;
-  }): Promise<IUserOtp | null> {
+  async getUserOtpByDate({ email }: { email?: string }): Promise<IUserOtp | null> {
     const match: any = {
-      createdAt: { $gte: date },
       otpEntered: false,
     };
+
+    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
+
+    match.createdAt = { $gte: tenMinutesAgo };
 
     match.email = email;
 
@@ -145,7 +142,7 @@ class UserService {
 
     const formattedDate = formatEgyptianTime(tenMinutesAgo);
 
-    const otpDoc = await this.getUserOtpByDate({ email, date: formattedDate });
+    const otpDoc = await this.getUserOtpByDate({ email });
 
     if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
       const otp = this.generateOTP();
@@ -180,6 +177,9 @@ class UserService {
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {
     await User.updateOne({ _id: userId }, { refreshToken: '' });
+  }
+  async increaseOtpAttempts(email: string): Promise<UpdateResult> {
+    return UserOtp.updateOne({ email }, { $inc: { trials: 1 } });
   }
 }
 

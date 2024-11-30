@@ -97,11 +97,7 @@ export async function completeRegsitration(
       return;
     }
 
-    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
-
-    const formattedDate = formatEgyptianTime(tenMinutesAgo);
-
-    const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
+    const otpDoc = await AuthService.getUserOtpByDate({ email });
 
     if (!otpDoc) {
       res.status(410).send({
@@ -178,13 +174,9 @@ export async function verifyOtp(
       return;
     }
 
-    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
+    const otpDoc = await AuthService.getUserOtpByDate({ email });
 
-    const formattedDate = formatEgyptianTime(tenMinutesAgo);
-
-    const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
-
-    if (!otpDoc) {
+    if (!otpDoc || (otpDoc && otpDoc.trials >= 3)) {
       res.status(410).send({
         message: 'OTP expired.',
         success: false,
@@ -196,6 +188,7 @@ export async function verifyOtp(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
+      await AuthService.increaseOtpAttempts(email);
       res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
