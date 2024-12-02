@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Document, NumberExpression, ObjectId } from 'mongoose';
+import { Schema, model, Document, NumberExpression, ObjectId } from 'mongoose';
 
 export interface ICountry extends Document {
   _id: ObjectId;
@@ -30,6 +30,6 @@ const countrySchema = new Schema(
   { timestamps: true }
 );
 
-const CountrySchema = model<ICountry>('Country', countrySchema, 'Countries');
+const Cart = model<ICountry>('Country', countrySchema, 'Countries');
 
-export default CountrySchema;
+export default Cart;
