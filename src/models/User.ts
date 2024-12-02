@@ -7,6 +7,16 @@ export interface IUser extends Document {
   name: { first: string; last: string };
   password: string;
   refreshToken: string | null;
+  addresses: [
+    {
+      city: string;
+      country: string;
+      name: { first: string; last: string };
+      phone: string;
+      postalCode: string;
+      region: string;
+    },
+  ];
 }
 
 const userSchema: Schema = new Schema(
@@ -30,10 +40,12 @@ const userSchema: Schema = new Schema(
         {
           city: { type: String, required: true },
           country: { type: String, required: true },
-          firstName: { type: String, required: true },
-          lastName: { type: String, required: true },
+          name: {
+            first: { type: String, required: true },
+            last: { type: String, required: true },
+          },
           phone: { type: String, required: true },
-          postalCode: { type: String, required: true },
+          postalCode: { type: String },
           region: { type: String, required: true },
         },
       ],

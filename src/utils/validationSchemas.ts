@@ -164,3 +164,13 @@ export const updateItemQuantitySchema = [
     .isInt({ min: 1, max: 100 })
     .withMessage('Quantity must be an integer between 1 and 100.'),
 ];
+
+export const createNewUserAddressSchema = [
+  body('city').exists({ checkFalsy: true }).withMessage('City is required.'),
+  body('country').exists({ checkFalsy: true }).withMessage('Country is required.'),
+  body('name.first').exists({ checkFalsy: true }).withMessage('First name is required.'),
+  body('name.last').exists({ checkFalsy: true }).withMessage('Last name is required.'),
+  body('phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
+  body('postalCode').optional().withMessage('Postal code is optional.'),
+  body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+];
