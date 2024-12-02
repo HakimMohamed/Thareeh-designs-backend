@@ -21,6 +21,8 @@ const userOtpSchema: Schema = new Schema(
   }
 );
 
+userOtpSchema.index({ email: 'asc', createdAt: 'asc' });
+
 const User = mongoose.model<IUserOtp>('UserOtp', userOtpSchema, 'UserOtps');
 
 export default User;

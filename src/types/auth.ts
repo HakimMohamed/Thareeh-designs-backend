@@ -1,20 +1,23 @@
-export interface BaseResponse {
-  message: string;
-  success: boolean;
-}
+import { IUser } from '../models/User';
+import { BaseResponse } from './response';
 
 export interface AuthDataResponse extends BaseResponse {
   data: null;
+}
+export interface GetUserResponse extends BaseResponse {
+  data: IUser | null;
 }
 export interface CompleteRegisterationSchema extends BaseResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    user: {
+      email: string;
+      userId: string;
+    };
   } | null;
 }
-export interface RequestEmailOTPResponse extends BaseResponse {
-  data: null;
-}
+
 export interface RefreshTokenResponse extends BaseResponse {
   data: {
     accessToken: string;
@@ -27,9 +30,10 @@ export interface LogOutResponse extends BaseResponse {
   } | null;
 }
 
-export interface VerifyEmailResponse extends BaseResponse {
+export interface VerifyOtpResponse extends BaseResponse {
   data: {
     accessToken: string;
     refreshToken: string;
+    user: IUser;
   } | null;
 }

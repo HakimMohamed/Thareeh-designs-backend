@@ -5,19 +5,39 @@ import {
   RefreshTokenDto,
   CompleteRegisterationDto,
   LogoutDto,
-  VerifyEmailDto,
+  VerifyOtpDto,
 } from '../dtos/auth.dto';
 import {
   AuthDataResponse,
   CompleteRegisterationSchema,
+  GetUserResponse,
   LogOutResponse,
   RefreshTokenResponse,
-  RequestEmailOTPResponse,
-  VerifyEmailResponse,
+  VerifyOtpResponse,
 } from '../types/auth';
-import AuthService from '../services/auth';
+import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
-import helpers from '../utils/helpers';
+import { formatEgyptianTime, toObjectId } from '../utils/helpers';
+
+export async function getUser(
+  req: Request,
+  res: Response<GetUserResponse>,
+  next: NextFunction
+): Promise<void> {
+  const userId = req.user?.userId!;
+
+  try {
+    const existingUser = await AuthService.getUserById(userId);
+
+    res.status(200).send({
+      message: `User fetched successfully.`,
+      data: existingUser,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
 
 export async function register(
   req: Request<{}, {}, RegisterDto>,
@@ -30,8 +50,8 @@ export async function register(
     const existingUser = await AuthService.checkEmailExistance(email);
 
     if (existingUser) {
-      res.status(409).json({
-        message: 'Email number already in use.',
+      res.status(409).send({
+        message: 'Email already in use.',
         success: false,
         data: null,
       });
@@ -46,9 +66,9 @@ export async function register(
       success: true,
     });
   } catch (error: any) {
-    if (error === 'Blocked For 10 minutes due to multiple failed attempts.') {
-      res.status(403).json({
-        message: error,
+    if (error.message === 'Blocked For 10 minutes due to multiple failed attempts.') {
+      res.status(403).send({
+        message: error.message,
         success: false,
         data: null,
       });
@@ -63,13 +83,13 @@ export async function completeRegsitration(
   res: Response<CompleteRegisterationSchema>,
   next: NextFunction
 ): Promise<void> {
-  const { email, password, otp } = req.body;
+  const { email, password, otp, firstName, lastName } = req.body;
 
   try {
     const existingUser = await AuthService.checkUserExistance(email);
 
     if (existingUser) {
-      res.status(409).json({
+      res.status(409).send({
         message: 'Email already in use.',
         success: false,
         data: null,
@@ -77,14 +97,10 @@ export async function completeRegsitration(
       return;
     }
 
-    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
-
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
-
-    const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
+    const otpDoc = await AuthService.getUserOtpByDate({ email });
 
     if (!otpDoc) {
-      res.status(410).json({
+      res.status(410).send({
         message: 'OTP expired.',
         success: false,
         data: null,
@@ -95,7 +111,7 @@ export async function completeRegsitration(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
-      res.status(403).json({
+      res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
         data: null,
@@ -103,21 +119,33 @@ export async function completeRegsitration(
       return;
     }
 
-    const { refreshToken, accessToken } = await AuthService.register(email, password);
+    const { refreshToken, accessToken, userId } = await AuthService.register(
+      email,
+      password,
+      firstName,
+      lastName
+    );
 
-    await AuthService.verifyUserOtp(otpDoc._id);
+    await Promise.all([
+      AuthService.verifyUserOtp(otpDoc._id),
+      AuthService.verifyUser(userId, refreshToken),
+    ]);
 
-    res.send({
+    res.status(200).send({
       message: 'Register successful.',
       data: {
         refreshToken,
         accessToken,
+        user: {
+          userId: userId.toString(),
+          email,
+        },
       },
       success: true,
     });
   } catch (error: any) {
     if (error && error.code === 'E11000') {
-      res.status(409).json({
+      res.status(409).send({
         message: 'Email already in use.',
         success: false,
         data: null,
@@ -128,9 +156,9 @@ export async function completeRegsitration(
   }
 }
 
-export async function verifyEmail(
-  req: Request<{}, {}, VerifyEmailDto>,
-  res: Response<VerifyEmailResponse>,
+export async function verifyOtp(
+  req: Request<{}, {}, VerifyOtpDto>,
+  res: Response<VerifyOtpResponse>,
   next: NextFunction
 ): Promise<void> {
   const { email, otp } = req.body;
@@ -146,14 +174,10 @@ export async function verifyEmail(
       return;
     }
 
-    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
+    const otpDoc = await AuthService.getUserOtpByDate({ email });
 
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
-
-    const otpDoc = await AuthService.getUserOtpByDate({ email, date: formattedDate });
-
-    if (!otpDoc) {
-      res.status(410).json({
+    if (!otpDoc || (otpDoc && otpDoc.trials >= 3)) {
+      res.status(410).send({
         message: 'OTP expired.',
         success: false,
         data: null,
@@ -164,7 +188,8 @@ export async function verifyEmail(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
-      res.status(403).json({
+      await AuthService.increaseOtpAttempts(email);
+      res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
         data: null,
@@ -172,19 +197,24 @@ export async function verifyEmail(
       return;
     }
 
-    const promises = [AuthService.verifyUserOtp(otpDoc._id)];
+    const { refreshToken, accessToken } = AuthService.generateTokens(
+      user._id.toString(),
+      email,
+      user.name.first,
+      user.name.last
+    );
 
-    if (!user.verified) promises.push(AuthService.verifyUser(user._id));
-
-    await Promise.all(promises);
-
-    const { refreshToken, accessToken } = AuthService.generateTokens(user._id.toString());
+    await Promise.all([
+      AuthService.verifyUserOtp(otpDoc._id),
+      AuthService.verifyUser(user._id, refreshToken),
+    ]);
 
     res.status(200).send({
       message: 'Email verified successfully.',
       data: {
         refreshToken,
         accessToken,
+        user,
       },
       success: true,
     });
@@ -223,12 +253,20 @@ export async function login(
 
     await AuthService.sendOtp(email);
 
-    res.send({
+    res.status(200).send({
       message: `Otp sent to ${email}.`,
       data: null,
       success: true,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === 'Blocked For 10 minutes due to multiple failed attempts.') {
+      res.status(403).send({
+        message: error.message,
+        success: false,
+        data: null,
+      });
+      return;
+    }
     next(error);
   }
 }
@@ -239,7 +277,6 @@ export async function refreshAccessToken(
   next: NextFunction
 ): Promise<void> {
   const { refreshToken } = req.body;
-
   try {
     const user = await AuthService.validateRefreshToken(refreshToken);
 
@@ -252,9 +289,13 @@ export async function refreshAccessToken(
       return;
     }
 
-    const newAccessToken = AuthService.generateAccessToken(user._id.toString());
-
-    res.send({
+    const newAccessToken = AuthService.generateAccessToken(
+      user._id.toString(),
+      user.email,
+      user.name.first,
+      user.name.last
+    );
+    res.status(200).send({
       message: 'Access token refreshed successfully.',
       data: {
         accessToken: newAccessToken,

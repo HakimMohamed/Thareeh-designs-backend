@@ -1,14 +1,13 @@
 import User, { IUser } from '../models/User';
-import Log from '../models/Log';
 import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { ObjectId } from 'mongoose';
+import { ObjectId, UpdateResult } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import createEmailTransporter from '../config/nodeMailer';
-import LoggingService from './logs';
-import helpers, { toObjectId } from '../utils/helpers';
+import LoggingService from './Log.service';
+import { toObjectId, formatEgyptianTime } from '../utils/helpers';
 
 class UserService {
   private transporter: Transporter;
@@ -18,22 +17,33 @@ class UserService {
   }
   async register(
     email: string,
-    password: string
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+    password: string,
+    firstName: string,
+    lastName: string
+  ): Promise<{ accessToken: string; refreshToken: string; userId: ObjectId }> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       email,
+      name: {
+        first: firstName,
+        last: lastName,
+      },
       password: hashedPassword,
     }) as IUser;
 
-    const { accessToken, refreshToken } = this.generateTokens(user._id.toString());
+    const { accessToken, refreshToken } = this.generateTokens(
+      user._id.toString(),
+      email,
+      firstName,
+      lastName
+    );
 
     user.refreshToken = refreshToken;
 
     await user.save();
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user._id };
   }
   async validateRefreshToken(refreshToken: string): Promise<IUser | null> {
     try {
@@ -43,7 +53,7 @@ class UserService {
 
       const user = await User.findById(decoded.userId).lean();
 
-      if (!user || user.refreshToken !== refreshToken) {
+      if (user?.refreshToken !== refreshToken) {
         return null;
       }
 
@@ -52,36 +62,41 @@ class UserService {
       return null;
     }
   }
-  generateTokens(userId: string): {
+  generateTokens(
+    userId: string,
+    email: string,
+    firstName: string,
+    lastName: string
+  ): {
     accessToken: string;
     refreshToken: string;
   } {
     return {
-      accessToken: this.generateAccessToken(userId),
-      refreshToken: this.generateRefreshToken(userId),
+      accessToken: this.generateAccessToken(userId, email, firstName, lastName),
+      refreshToken: this.generateRefreshToken(userId, email, firstName, lastName),
     };
   }
-  generateAccessToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  generateAccessToken(userId: string, email: string, firstName: string, lastName: string): string {
+    return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.JWT_EXPIRY,
     });
   }
-  generateRefreshToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  generateRefreshToken(userId: string, email: string, firstName: string, lastName: string): string {
+    return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     });
   }
   async checkUserExistance(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email: email.toLowerCase() }).lean()) as IUser | null;
+    return User.findOne({ email: email.toLowerCase() }).lean<IUser | null>();
   }
   async checkEmailExistance(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email }).lean()) as IUser | null;
+    return User.findOne({ email }).lean<IUser | null>();
   }
   async getUserByEmail(email: string): Promise<IUser | null> {
-    return (await User.findOne({ email }).lean()) as IUser | null;
+    return User.findOne({ email }).lean<IUser | null>();
   }
   async getUserById(id: string): Promise<IUser | null> {
-    return (await User.findOne({ _id: toObjectId(id) }).lean()) as IUser | null;
+    return User.findOne({ _id: toObjectId(id) }, { password: 0 }).lean<IUser | null>();
   }
   async validateUser(user: IUser, password: string): Promise<Boolean> {
     return bcrypt.compare(password, user.password);
@@ -109,32 +124,26 @@ class UserService {
     await this.transporter.sendMail(mailOptions);
   }
 
-  async getUserOtpByDate({
-    email,
-    date,
-  }: {
-    email?: string;
-    date: Date;
-  }): Promise<IUserOtp | null> {
+  async getUserOtpByDate({ email }: { email?: string }): Promise<IUserOtp | null> {
     const match: any = {
-      createdAt: { $gte: date },
       otpEntered: false,
     };
 
+    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
+
+    match.createdAt = { $gte: tenMinutesAgo };
+
     match.email = email;
 
-    return UserOtp.findOne().lean() as Promise<IUserOtp | null>;
+    return UserOtp.findOne(match).sort({ createdAt: -1 }).lean<IUserOtp | null>();
   }
   async sendOtp(email: string): Promise<void> {
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
-    const formattedDate = helpers.formatEgyptianTime(tenMinutesAgo);
+    const otpDoc = await this.getUserOtpByDate({ email });
 
-    const otpDoc = await this.getUserOtpByDate({ email, date: formattedDate });
-
-    if (!otpDoc || (otpDoc && !(otpDoc.trials >= 4))) {
-      const otp = await this.generateOTP();
-
+    if (!otpDoc || (otpDoc && !(otpDoc.trials >= 3))) {
+      const otp = this.generateOTP();
       this.sendOTPEmail(email, otp.toString()).catch(err => {
         const logger = LoggingService.getInstance();
         logger.logError(err);
@@ -155,17 +164,20 @@ class UserService {
         }
       );
     } else {
-      return Promise.reject('Blocked For 10 minutes due to multiple failed attempts.');
+      throw new Error('Blocked For 10 minutes due to multiple failed attempts.');
     }
   }
   async verifyUserOtp(otpDocId: ObjectId): Promise<void> {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
-  async verifyUser(userId: ObjectId): Promise<void> {
-    await UserOtp.updateOne({ _id: userId }, { verified: true });
+  async verifyUser(userId: ObjectId, refreshToken: string): Promise<UpdateResult> {
+    return User.updateOne({ _id: userId }, { refreshToken });
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {
     await User.updateOne({ _id: userId }, { refreshToken: '' });
+  }
+  async increaseOtpAttempts(email: string): Promise<UpdateResult> {
+    return UserOtp.updateOne({ email }, { $inc: { trials: 1 } });
   }
 }
 

@@ -1,6 +1,6 @@
 // src/utils/validationSchemas.ts
 
-import { body } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const registerSchema = [
   body('email')
@@ -36,6 +36,18 @@ export const completeRegisterationSchema = [
     .withMessage('Otp is required.')
     .isLength({ min: 4, max: 4 })
     .withMessage('Otp must be exactly 4 characters long.'),
+
+  body('firstName')
+    .exists({ checkFalsy: true })
+    .withMessage('First name is required.')
+    .isLength({ max: 256 })
+    .withMessage('First name must be at most 256 characters long.'),
+
+  body('lastName')
+    .exists({ checkFalsy: true })
+    .withMessage('Last name is required.')
+    .isLength({ max: 256 })
+    .withMessage('Last name must be at most 256 characters long.'),
 ];
 export const loginSchema = [
   body('email')
@@ -57,7 +69,7 @@ export const requestEmailOTPSchema = [
     .isLength({ max: 256 })
     .withMessage('Email must be at most 256 characters long.'),
 ];
-export const verifyEmailSchema = [
+export const verifyOtpSchema = [
   body('email')
     .exists({ checkFalsy: true })
     .withMessage('Email is required.')
@@ -75,4 +87,80 @@ export const verifyEmailSchema = [
 
 export const refreshTokenSchema = [
   body('refreshToken').exists({ checkFalsy: true }).withMessage('Refresh token is required.'),
+];
+
+export const getItemsSchema = [
+  query('page').exists({ checkFalsy: true }).withMessage('page index is required.'),
+  query('pageSize')
+    .exists({ checkFalsy: true })
+    .withMessage('page size is required.')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Otp must be exactly 4 characters long.'),
+
+  query('categories').optional(),
+];
+
+export const getItemByIdSchema = [
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+];
+
+export const getFeaturedItemsByIdSchema = [
+  query('excludeId')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .optional()
+    .withMessage('Item id is required.'),
+  query('pageSize')
+    .exists({ checkFalsy: true })
+    .withMessage('Page size is required.')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Page size must be exactly 4 characters long.'),
+];
+
+export const createOrUpdateCartSchema = [
+  body('items')
+    .exists({ checkFalsy: true })
+    .withMessage('Items is required.')
+    .isArray({ min: 1, max: 100 })
+    .withMessage('Items must be an array of at least 1 item and at most 100 items.'),
+];
+
+export const addItemToCartSchema = [
+  body('itemId')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+];
+
+export const removeItemFromCartSchema = [
+  body('itemId')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+];
+
+export const updateItemQuantitySchema = [
+  body('itemId')
+    .exists({ checkFalsy: true })
+    .withMessage('Item is required.')
+    .isMongoId()
+    .withMessage('Invalid item id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Item id is required.'),
+
+  body('quantity')
+    .exists({ checkFalsy: true })
+    .withMessage('Quantity is required.')
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Quantity must be an integer between 1 and 100.'),
 ];
