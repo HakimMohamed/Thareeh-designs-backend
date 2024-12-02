@@ -7,7 +7,6 @@ export interface IUser extends Document {
   name: { first: string; last: string };
   password: string;
   refreshToken: string | null;
-  verified: boolean;
 }
 
 const userSchema: Schema = new Schema(
@@ -24,7 +23,6 @@ const userSchema: Schema = new Schema(
       first: { type: String, required: true },
       last: { type: String, required: true },
     },
-    verified: { required: true, type: Boolean, default: false },
     password: { type: String, required: true },
     refreshToken: { type: String, default: null, index: 'asc' },
     addresses: {

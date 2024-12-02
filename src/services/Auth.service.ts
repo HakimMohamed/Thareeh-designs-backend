@@ -171,7 +171,7 @@ class UserService {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
   async verifyUser(userId: ObjectId, refreshToken: string): Promise<UpdateResult> {
-    return User.updateOne({ _id: userId }, { verified: true, refreshToken });
+    return User.updateOne({ _id: userId }, { refreshToken });
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {
     await User.updateOne({ _id: userId }, { refreshToken: '' });
