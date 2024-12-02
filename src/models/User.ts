@@ -18,6 +18,7 @@ const userSchema: Schema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      index: 'asc',
     },
     name: {
       first: { type: String, required: true },
@@ -25,14 +26,26 @@ const userSchema: Schema = new Schema(
     },
     verified: { required: true, type: Boolean, default: false },
     password: { type: String, required: true },
-    refreshToken: { type: String, default: null },
+    refreshToken: { type: String, default: null, index: 'asc' },
+    addresses: {
+      type: [
+        {
+          city: { type: String, required: true },
+          country: { type: String, required: true },
+          firstName: { type: String, required: true },
+          lastName: { type: String, required: true },
+          phone: { type: String, required: true },
+          postalCode: { type: String, required: true },
+          region: { type: String, required: true },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,
   }
 );
-
-userSchema.index({ email: 'asc' });
 
 const User = mongoose.model<IUser>('User', userSchema, 'Users');
 
