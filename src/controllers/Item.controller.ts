@@ -38,11 +38,11 @@ export async function getItems(
 }
 
 export async function getItemById(
-  req: Request<GetItemByIdQueryParams>,
+  req: Request<{}, {}, {}, GetItemByIdQueryParams>,
   res: Response<GetItemByIdResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { id } = req.params;
+  const { id } = req.query;
 
   try {
     const item = await ItemService.getItemById(id as string);

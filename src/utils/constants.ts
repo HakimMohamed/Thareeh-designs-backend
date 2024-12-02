@@ -7,8 +7,7 @@ const constants = {
     '/api/auth/complete-registeration',
     '/api/auth/refresh-token',
     '/api/auth/logout',
-    '/api/items',
-    /^\/api\/items\/\w+$/,
+    '/api/items/item',
     '/api/items/featured',
   ],
 };

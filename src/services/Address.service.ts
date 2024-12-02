@@ -1,7 +1,8 @@
 import { UpdateResult } from 'mongoose';
 import { ICountry } from '../models/Country';
 import Country from '../models/Country';
-import User from '../models/User';
+import User, { IUser } from '../models/User';
+import { toObjectId } from '../utils/helpers';
 class AddressService {
   async getCountries(): Promise<ICountry[] | null> {
     return Country.find({}).lean<ICountry[] | null>();
@@ -28,6 +29,12 @@ class AddressService {
       { email },
       { $push: { addresses: { city, country, name, phone, region, postalCode } } }
     );
+  }
+
+  async getUserAddresses(userId: string): Promise<IUser['addresses'] | []> {
+    const user = await User.findOne({ _id: toObjectId(userId) }).lean<IUser | null>();
+
+    return user?.addresses || [];
   }
 }
 
