@@ -8,7 +8,7 @@ import {
   UpdateItemQuantityDto,
 } from '../dtos/cart.dto';
 import { CreateOrUpdateCartResponse } from '../types/cart';
-import { ICartItem, IFormattedCart } from '../models/Cart';
+import { ICartItem } from '../models/Cart';
 
 export async function createOrUpdateCart(
   req: Request<{}, {}, CreateOrUpdateDto>,

@@ -6,9 +6,6 @@ import {
 } from '../types/query-parameters';
 import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
 import ItemService from '../services/Item.service';
-import CartService from '../services/Cart.service';
-import { ICartItem } from '../models/Cart';
-import { authenticateUser } from '../utils/helpers';
 
 export async function getItems(
   req: Request<{}, {}, {}, GetItemsQueryParams>,

@@ -17,7 +17,6 @@ import {
 } from '../types/auth';
 import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
-import { formatEgyptianTime, toObjectId } from '../utils/helpers';
 
 export async function getUser(
   req: Request,
