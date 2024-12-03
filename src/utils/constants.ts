@@ -8,6 +8,7 @@ const constants = {
     '/api/auth/refresh-token',
     '/api/auth/logout',
     '/api/items/item',
+    '/api/items',
     '/api/items/featured',
   ],
 };
