@@ -8,6 +8,13 @@ class OrderService {
       .limit(pageSize)
       .lean<IOrder[] | null>();
   }
+
+  async getUserOrderById(orderId: string, userId: string): Promise<IOrder | null> {
+    return Order.findOne({
+      _id: toObjectId(orderId),
+      _user: toObjectId(userId),
+    }).lean<IOrder | null>();
+  }
 }
 
 export default new OrderService();

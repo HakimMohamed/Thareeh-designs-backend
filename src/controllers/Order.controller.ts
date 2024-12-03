@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '../services/Order.service';
-import { GetUserOrdersResponse } from '../types/order';
+import { GetUserOrderByIdResponse, GetUserOrdersResponse } from '../types/order';
 import { GetUserOrdersDto } from '../dtos/order.dto';
 
 export async function getUserOrders(
@@ -18,6 +18,28 @@ export async function getUserOrders(
     res.status(200).send({
       message: `Orders fetched successfully.`,
       data: orders,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function getUserOrderById(
+  req: Request<{}, {}, {}, GetUserOrdersDto>,
+  res: Response<GetUserOrderByIdResponse>,
+  next: NextFunction
+): Promise<void> {
+  const { id } = req.query;
+
+  const userId = req.user?.userId!;
+
+  try {
+    const order = await OrderService.getUserOrderById(id as string, userId);
+
+    res.status(200).send({
+      message: `Orders fetched successfully.`,
+      data: order,
       success: true,
     });
   } catch (error: any) {

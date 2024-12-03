@@ -1,6 +1,5 @@
-import { ICartItem } from '../models/Cart';
-
 export interface GetUserOrdersDto {
-  page?: string;
-  pageSize?: string;
+  id?: string;
+  page?: number;
+  pageSize?: number;
 }

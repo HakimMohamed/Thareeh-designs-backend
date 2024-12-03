@@ -182,3 +182,20 @@ export const getUserAddressByIdSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Address id is required.'),
 ];
+
+export const getUserOrdersSchema = [
+  query('page').exists({ checkFalsy: true }).withMessage('page index is required.'),
+  query('pageSize')
+    .exists({ checkFalsy: true })
+    .withMessage('page size is required.')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Otp must be exactly 4 characters long.'),
+];
+
+export const getUserOrderByIdSchema = [
+  query('id')
+    .isMongoId()
+    .withMessage('Invalid order id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Order id is required.'),
+];
