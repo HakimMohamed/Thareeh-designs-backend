@@ -5,7 +5,11 @@ import {
   GetUserAddressByIdResponse,
   GetUserAddressesResponse,
 } from '../types/address';
-import { CreateNewAddressDto, GetUserAddressByIdDto } from '../dtos/address.dto';
+import {
+  CreateNewAddressDto,
+  GetUserAddressByIdDto,
+  RemoveUserAddressDto,
+} from '../dtos/address.dto';
 import { IUser } from '../models/User';
 
 export async function getCountries(
@@ -69,16 +73,38 @@ export async function getUserAddressById(
   res: Response<GetUserAddressByIdResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { addressId } = req.query;
+  const { id } = req.query;
 
   const userId = req.user?.userId!;
 
   try {
-    const address = await AddressService.getUserAddressById(userId, addressId as string);
+    const address = await AddressService.getUserAddressById(userId, id as string);
 
     res.status(200).send({
       message: `Addresses fetched successfully.`,
       data: address,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function removeUserAddress(
+  req: Request<{}, {}, {}, RemoveUserAddressDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { id } = req.query;
+
+  const userId = req.user?.userId!;
+
+  try {
+    await AddressService.removeUserAddress(userId, id as string);
+
+    res.status(200).send({
+      message: `Addresses deleted successfully.`,
+      data: null,
       success: true,
     });
   } catch (error: any) {

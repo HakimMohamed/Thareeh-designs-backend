@@ -55,6 +55,13 @@ class AddressService {
 
     return address || null;
   }
+
+  async removeUserAddress(userId: string, addressId: string): Promise<UpdateResult> {
+    return User.updateOne(
+      { _id: toObjectId(userId) },
+      { $pull: { addresses: { _id: toObjectId(addressId) } } }
+    );
+  }
 }
 
 export default new AddressService();

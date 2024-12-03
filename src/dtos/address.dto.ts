@@ -12,5 +12,9 @@ export interface CreateNewAddressDto {
 }
 
 export interface GetUserAddressByIdDto {
-  addressId?: string;
+  id?: string;
+}
+
+export interface RemoveUserAddressDto {
+  id?: string;
 }

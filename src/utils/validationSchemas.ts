@@ -175,8 +175,16 @@ export const createNewUserAddressSchema = [
   body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
 ];
 
+export const removeUserAddressSchema = [
+  query('id')
+    .isMongoId()
+    .withMessage('Invalid address id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Address id is required.'),
+];
+
 export const getUserAddressByIdSchema = [
-  query('addressId')
+  query('id')
     .isMongoId()
     .withMessage('Invalid address id.')
     .exists({ checkFalsy: true })

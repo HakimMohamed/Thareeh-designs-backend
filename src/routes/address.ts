@@ -4,15 +4,23 @@ import {
   getCountries,
   getUserAddressById,
   getUserAddresses,
+  removeUserAddress,
 } from '../controllers/Address.controller';
 import validateSchema from '../middlewares/validateSchema';
-import { createNewUserAddressSchema, getUserAddressByIdSchema } from '../utils/validationSchemas';
+import {
+  createNewUserAddressSchema,
+  getUserAddressByIdSchema,
+  removeUserAddressSchema,
+} from '../utils/validationSchemas';
 
 const router = Router();
 
 router.get('/', getCountries);
 router.get('/user/', getUserAddresses);
 router.get('/user/address', getUserAddressByIdSchema, validateSchema, getUserAddressById);
+
+router.delete('/user/address', removeUserAddressSchema, validateSchema, removeUserAddress);
+
 router.post('/', createNewUserAddressSchema, validateSchema, createNewUserAddress);
 
 export default router;
