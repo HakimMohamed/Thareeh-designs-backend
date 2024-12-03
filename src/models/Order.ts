@@ -1,21 +1,14 @@
 // models/User.ts
 import mongoose, { Document, ObjectId, Schema } from 'mongoose';
 import ItemSchema, { IItem } from './Item';
+import { addressSchema, IUser } from './User';
 
 export interface IOrder extends Document {
   _id: ObjectId;
   _user: ObjectId;
   items: IItem[];
   status: string;
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    phone: string;
-  };
+  shippingAddress: IUser['addresses'][0];
   payment: {
     method: string;
     status: string;
@@ -39,15 +32,7 @@ const orderSchema: Schema = new Schema(
       enum: ['active', 'completed'],
       default: 'active',
     },
-    shippingAddress: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      postalCode: { type: String, default: '' },
-      country: { type: String, required: true },
-      phone: { type: String, required: true },
-    },
+    shippingAddress: addressSchema,
     payment: {
       method: { type: String, enum: ['online', 'cod'], required: true },
       status: { type: String, enum: ['pending', 'completed'], default: 'pending' },
