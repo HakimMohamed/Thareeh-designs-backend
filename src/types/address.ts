@@ -9,3 +9,7 @@ export interface GetCountriesResponse extends BaseResponse {
 export interface GetUserAddressesResponse extends BaseResponse {
   data: IUser['addresses'] | [];
 }
+
+export interface GetUserAddressByIdResponse extends BaseResponse {
+  data: IUser['addresses'][0] | null;
+}

@@ -174,3 +174,11 @@ export const createNewUserAddressSchema = [
   body('postalCode').optional().withMessage('Postal code is optional.'),
   body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
 ];
+
+export const getUserAddressByIdSchema = [
+  query('addressId')
+    .isMongoId()
+    .withMessage('Invalid address id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Address id is required.'),
+];

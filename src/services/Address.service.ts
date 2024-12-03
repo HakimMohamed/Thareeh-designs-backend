@@ -32,9 +32,28 @@ class AddressService {
   }
 
   async getUserAddresses(userId: string): Promise<IUser['addresses'] | []> {
-    const user = await User.findOne({ _id: toObjectId(userId) }).lean<IUser | null>();
+    const user = await User.findOne(
+      { _id: toObjectId(userId) },
+      { addresses: 1 }
+    ).lean<IUser | null>();
 
     return user?.addresses || [];
+  }
+
+  async getUserAddressById(
+    userId: string,
+    addressId: string
+  ): Promise<IUser['addresses'][0] | null> {
+    const user = await User.findOne(
+      { _id: toObjectId(userId) },
+      {
+        addresses: 1,
+      }
+    ).lean<IUser | null>();
+
+    const address = user?.addresses.find(a => a?._id.toString() === addressId);
+
+    return address || null;
   }
 }
 

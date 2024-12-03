@@ -8,6 +8,7 @@ export interface IUser extends Document {
   password: string;
   refreshToken: string | null;
   addresses: {
+    _id: ObjectId;
     city: string;
     country: string;
     name: { first: string; last: string };

@@ -10,3 +10,7 @@ export interface CreateNewAddressDto {
   postalCode?: string;
   region: string;
 }
+
+export interface GetUserAddressByIdDto {
+  addressId?: string;
+}
