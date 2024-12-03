@@ -109,11 +109,8 @@ export const getItemByIdSchema = [
 ];
 
 export const getFeaturedItemsByIdSchema = [
-  query('excludeId')
-    .isMongoId()
-    .withMessage('Invalid item id.')
-    .optional()
-    .withMessage('Item id is required.'),
+  query('excludeId').isMongoId().withMessage('Invalid item id.').optional(),
+
   query('pageSize')
     .exists({ checkFalsy: true })
     .withMessage('Page size is required.')
@@ -171,7 +168,7 @@ export const createNewUserAddressSchema = [
   body('name.first').exists({ checkFalsy: true }).withMessage('First name is required.'),
   body('name.last').exists({ checkFalsy: true }).withMessage('Last name is required.'),
   body('phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
-  body('postalCode').optional().withMessage('Postal code is optional.'),
+  body('postalCode').optional(),
   body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
 ];
 

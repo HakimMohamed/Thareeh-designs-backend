@@ -1,6 +1,6 @@
 // models/User.ts
 import mongoose, { Document, ObjectId, Schema } from 'mongoose';
-import ItemSchema, { IItem } from './Item';
+import { IItem, itemsSchema } from './Item';
 import { addressSchema, IUser } from './User';
 
 export interface IOrder extends Document {
@@ -26,7 +26,7 @@ const orderSchema: Schema = new Schema(
       ref: 'User',
       required: true,
     },
-    items: ItemSchema,
+    items: itemsSchema,
     status: {
       type: String,
       enum: ['active', 'completed'],

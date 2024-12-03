@@ -13,7 +13,7 @@ export interface IItem extends Document {
   };
 }
 
-const itemsSchema = new Schema(
+export const itemsSchema = new Schema(
   {
     name: { type: String, required: true },
     price: { type: Number, required: true },
@@ -30,6 +30,6 @@ const itemsSchema = new Schema(
 
 itemsSchema.index({ price: 'asc' });
 
-const ItemSchema = model<IItem>('Item', itemsSchema, 'Items');
+const Item = model<IItem>('Item', itemsSchema, 'Items');
 
-export default ItemSchema;
+export default Item;
