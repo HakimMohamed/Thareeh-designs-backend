@@ -11,6 +11,6 @@ const router = Router();
 
 router.get('/', getItemsSchema, validateSchemaMiddlware, getItems);
 router.get('/featured', getFeaturedItemsByIdSchema, validateSchemaMiddlware, getFeaturedItems);
-router.get('/:id', getItemByIdSchema, validateSchemaMiddlware, getItemById);
+router.get('/item', getItemByIdSchema, validateSchemaMiddlware, getItemById);
 
 export default router;

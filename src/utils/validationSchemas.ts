@@ -101,7 +101,7 @@ export const getItemsSchema = [
 ];
 
 export const getItemByIdSchema = [
-  param('id')
+  query('id')
     .isMongoId()
     .withMessage('Invalid item id.')
     .exists({ checkFalsy: true })
