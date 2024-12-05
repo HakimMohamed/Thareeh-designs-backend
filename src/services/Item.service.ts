@@ -46,18 +46,20 @@ class ItemService {
     excludeId?: string,
     cartItems?: string[] | []
   ): Promise<IItem[] | []> {
-    let matchStage: any = {};
+    const match: any = {};
 
     if (excludeId) {
-      matchStage = { $match: { _id: { $ne: toObjectId(excludeId) } } };
+      match._id = { $ne: toObjectId(excludeId) };
     }
 
     if (cartItems && cartItems.length > 0) {
-      matchStage = { $match: { _id: { $nin: cartItems.map(item => toObjectId(item)) } } };
+      match._id = { ...match._id, $nin: cartItems.map(item => toObjectId(item)) };
     }
 
     const randomDocs: IItem[] | [] = await Item.aggregate([
-      matchStage,
+      {
+        $match: match,
+      },
       { $sample: { size: pageSize } },
     ]);
 
