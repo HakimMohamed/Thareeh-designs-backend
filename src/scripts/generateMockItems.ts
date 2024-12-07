@@ -20,6 +20,51 @@ const itemSchema = new mongoose.Schema({
 
 const Item = mongoose.model('Item', itemSchema, 'Items');
 
+function generateRandomName(): string {
+  const adjectives = [
+    'Small',
+    'Large',
+    'Fancy',
+    'Elegant',
+    'Rustic',
+    'Modern',
+    'Vintage',
+    'Charming',
+    'Unique',
+    'Colorful',
+  ];
+  const materials = [
+    'Wooden',
+    'Metal',
+    'Plastic',
+    'Cotton',
+    'Silk',
+    'Leather',
+    'Glass',
+    'Ceramic',
+    'Stone',
+    'Fabric',
+  ];
+  const items = [
+    'Chair',
+    'Table',
+    'Lamp',
+    'Sofa',
+    'Desk',
+    'Shelf',
+    'Couch',
+    'Wardrobe',
+    'Mirror',
+    'Rack',
+  ];
+
+  const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomMaterial = materials[Math.floor(Math.random() * materials.length)];
+  const randomItem = items[Math.floor(Math.random() * items.length)];
+
+  return `${randomAdjective} ${randomMaterial} ${randomItem}`;
+}
+
 async function generateItems() {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -28,10 +73,10 @@ async function generateItems() {
     const files = await fs.promises.readdir(imagesPath);
 
     const items = files.map((file: any) => {
-      const filename = path.parse(file).name;
+      const filename = generateRandomName(); // Use custom random name generator
       const isActive = Math.random() < 0.3;
       return new Item({
-        name: filename,
+        name: filename, // Use generated name
         price: Math.floor(Math.random() * 100) + 1,
         image: `/images/${file}`,
         category: `category-${Math.floor(Math.random() * 10)}`,
