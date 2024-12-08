@@ -10,7 +10,6 @@ import {
   GetUserAddressByIdDto,
   RemoveUserAddressDto,
 } from '../dtos/address.dto';
-import { IUser } from '../models/User';
 
 export async function getCountries(
   req: Request,
