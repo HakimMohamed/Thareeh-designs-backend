@@ -204,3 +204,8 @@ export const getUserOrderByIdSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Order id is required.'),
 ];
+
+export const submitTicketSchema = [
+  body('subject').exists({ checkFalsy: true }).withMessage('Title is required.'),
+  body('description').exists({ checkFalsy: true }).withMessage('Description is required.'),
+];

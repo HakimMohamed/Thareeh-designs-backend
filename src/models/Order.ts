@@ -19,12 +19,13 @@ export interface IOrder extends Document {
   };
 }
 
-const orderSchema: Schema = new Schema(
+const orderSchema: Schema = new Schema<IOrder>(
   {
     _user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: 'asc',
     },
     items: itemsSchema,
     status: {
@@ -48,8 +49,6 @@ const orderSchema: Schema = new Schema(
     timestamps: true,
   }
 );
-
-orderSchema.index({ _user: 'asc' });
 
 const Order = mongoose.model<IOrder>('Order', orderSchema, 'Orders');
 

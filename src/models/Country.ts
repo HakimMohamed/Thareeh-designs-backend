@@ -14,7 +14,7 @@ export interface ICountry extends Document {
   regionType: string;
 }
 
-const countrySchema = new Schema(
+const countrySchema = new Schema<ICountry>(
   {
     name: { type: String, required: true, unqiue: true },
     code: { type: String, required: true, unqiue: true },

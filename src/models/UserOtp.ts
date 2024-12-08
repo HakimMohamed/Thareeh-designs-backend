@@ -9,7 +9,7 @@ export interface IUserOtp extends Document {
   otp: string;
 }
 
-const userOtpSchema: Schema = new Schema(
+const userOtpSchema: Schema = new Schema<IUserOtp>(
   {
     email: { type: String },
     otpEntered: { type: Boolean, default: false },

@@ -29,7 +29,7 @@ export const addressSchema: Schema = new Schema({
   region: { type: String, required: true },
 });
 
-const userSchema: Schema = new Schema(
+const userSchema: Schema = new Schema<IUser>(
   {
     email: {
       type: String,

@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-const errorLogSchema = new Schema(
+const errorLogSchema = new Schema<ErrorLogDocument>(
   {
     message: { type: String, required: true }, // Error message
     stackTrace: { type: String, required: true }, // Full stack trace

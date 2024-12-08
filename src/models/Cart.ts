@@ -33,7 +33,7 @@ export interface IFormattedCart {
   originalPrice: number;
 }
 
-const cartSchema: Schema = new Schema(
+const cartSchema: Schema = new Schema<ICart>(
   {
     _user: {
       type: mongoose.Schema.Types.ObjectId,
