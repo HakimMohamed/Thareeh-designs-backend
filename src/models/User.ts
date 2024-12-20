@@ -17,6 +17,7 @@ export interface IUser extends Document {
     region: string;
   }[];
 }
+
 export const addressSchema: Schema = new Schema({
   city: { type: String, required: true },
   country: { type: String, required: true },

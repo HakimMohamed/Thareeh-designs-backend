@@ -166,6 +166,13 @@ class CartService {
   async getUserUnformattedCart(userId: string): Promise<ICart | null> {
     return Cart.findOne({ _user: toObjectId(userId) }).lean<ICart | null>();
   }
+
+  async completeCart(userId: string): Promise<UpdateResult> {
+    return Cart.updateOne(
+      { _user: toObjectId(userId), status: 'active' },
+      { $set: { status: 'completed' } }
+    );
+  }
 }
 
 export default new CartService();

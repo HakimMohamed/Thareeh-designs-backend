@@ -56,7 +56,7 @@ export async function getUserCart(
 
     if (!cart || cart?.items?.length === 0) {
       res.status(404).send({
-        message: 'Something went wrong while fetching cart.',
+        message: 'Cart is empty.',
         data: null,
         success: false,
       });

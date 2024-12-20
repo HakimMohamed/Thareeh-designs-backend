@@ -1,16 +1,17 @@
 // models/User.ts
-import mongoose, { Document, ObjectId, Schema } from 'mongoose';
+import mongoose, { Document, ObjectId, Schema, Types } from 'mongoose';
 import { IItem, itemsSchema } from './Item';
 import { addressSchema, IUser } from './User';
+import { ICartItem, IFormattedCart } from './Cart';
 
-export interface IOrder extends Document {
-  _id: ObjectId;
-  _user: ObjectId;
-  items: IItem[];
-  status: string;
-  shippingAddress: IUser['addresses'][0];
+export interface IOrder {
+  _id: Types.ObjectId;
+  _user: Types.ObjectId;
+  items: IFormattedCart['items'];
+  status: 'pending' | 'active' | 'completed';
+  shippingAddress: Omit<IUser['addresses'][0], '_id'>;
   payment: {
-    method: string;
+    method: 'online' | 'cod';
     status: string;
   };
   price: {

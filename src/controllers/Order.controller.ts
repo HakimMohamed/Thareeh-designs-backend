@@ -1,7 +1,61 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '../services/Order.service';
 import { GetUserOrderByIdResponse, GetUserOrdersResponse } from '../types/order';
-import { GetUserOrdersDto } from '../dtos/order.dto';
+import { CreateOrderDto, GetUserOrdersDto } from '../dtos/order.dto';
+import CartService from '../services/Cart.service';
+import ItemService from '../services/Item.service';
+import { ICartItem } from '../models/Cart';
+
+export async function createOrder(
+  req: Request<{}, {}, CreateOrderDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { address, paymentMethod, saveInfo } = req.body;
+
+  const userId = req.user?.userId!;
+
+  try {
+    const cart = await CartService.getUserCart(userId);
+
+    if (!cart || cart?.items?.length === 0) {
+      res.status(404).send({
+        message: 'Please create a cart first start by adding one item.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    const fetchedItems = await ItemService.getItemsByIds(
+      cart.items.map((item: ICartItem) => item._id.toString())
+    );
+
+    if (!fetchedItems || (fetchedItems && fetchedItems.length === 0)) {
+      res.status(404).send({
+        message: 'Cart is empty.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    const formattedCart = CartService.formatCart(cart, fetchedItems);
+
+    await Promise.all([
+      OrderService.createOrder(userId, address, paymentMethod, formattedCart, saveInfo),
+      CartService.completeCart(userId),
+    ]);
+
+    res.status(201).send({
+      message: `Order created successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
 
 export async function getUserOrders(
   req: Request<{}, {}, {}, GetUserOrdersDto>,

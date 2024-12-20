@@ -205,6 +205,19 @@ export const getUserOrderByIdSchema = [
     .withMessage('Order id is required.'),
 ];
 
+export const createOrderSchema = [
+  body('paymentMethod').exists({ checkFalsy: true }).withMessage('Payment method is required.'),
+  body('saveInfo').optional(),
+  body('address').exists({ checkFalsy: true }).withMessage('Address is required.'),
+  body('address.city').exists({ checkFalsy: true }).withMessage('City is required.'),
+  body('address.country').exists({ checkFalsy: true }).withMessage('Country is required.'),
+  body('address.name.first').exists({ checkFalsy: true }).withMessage('First name is required.'),
+  body('address.name.last').exists({ checkFalsy: true }).withMessage('Last name is required.'),
+  body('address.phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
+  body('address.postalCode').optional(),
+  body('address.region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+];
+
 export const submitTicketSchema = [
   body('subject').exists({ checkFalsy: true }).withMessage('Title is required.'),
   body('description').exists({ checkFalsy: true }).withMessage('Description is required.'),
