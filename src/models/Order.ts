@@ -8,7 +8,7 @@ export interface IOrder {
   _id: Types.ObjectId;
   _user: Types.ObjectId;
   items: IFormattedCart['items'];
-  status: 'pending' | 'active' | 'completed';
+  status: 'pending' | 'active' | 'completed' | 'cancelled';
   shippingAddress: Omit<IUser['addresses'][0], '_id'>;
   payment: {
     method: 'online' | 'cod';
@@ -31,7 +31,7 @@ const orderSchema: Schema = new Schema<IOrder>(
     items: itemsSchema,
     status: {
       type: String,
-      enum: ['active', 'completed'],
+      enum: ['pending', 'active', 'completed', 'cancelled'],
       default: 'active',
     },
     shippingAddress: addressSchema,
