@@ -3,6 +3,8 @@ import { ICart, IFormattedCart } from '../models/Cart';
 import Order, { IOrder } from '../models/Order';
 import { IUser } from '../models/User';
 import { toObjectId } from '../utils/helpers';
+import EmailService from './Email.service';
+import { SendMailOptions } from 'nodemailer';
 
 class OrderService {
   async getUserOrders(userId: string, page: number, pageSize: number): Promise<IOrder[] | null> {
@@ -52,6 +54,20 @@ class OrderService {
       { _id: toObjectId(orderId), _user: toObjectId(userId) },
       { status: 'cancelled' }
     );
+  }
+
+  async sendOrderConfirmation(email: string): Promise<void> {
+    const emailService = await EmailService.getInstance();
+
+    const message = 'Your order has been confirmed.';
+    const mailOptions: SendMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Order Confirmation',
+      text: message,
+      html: `<p>Your order has been confirmed. Thank you for shopping with us.</p>`,
+    };
+    await emailService.sendEmail(mailOptions);
   }
 }
 

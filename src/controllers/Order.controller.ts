@@ -7,6 +7,7 @@ import ItemService from '../services/Item.service';
 import { ICartItem } from '../models/Cart';
 import AuthService from '../services/Auth.service';
 import AddressService from '../services/Address.service';
+import EmailService from '../services/Email.service';
 
 export async function cancelOrder(
   req: Request<{}, {}, CancelOrderDto>,
@@ -69,7 +70,10 @@ export async function createOrder(
   const userId = req.user?.userId!;
 
   try {
-    const cart = await CartService.getUserCart(userId);
+    const [cart, user] = await Promise.all([
+      CartService.getUserCart(userId),
+      AuthService.getUserById(userId),
+    ]);
 
     if (!cart || cart?.items?.length === 0) {
       res.status(404).send({
@@ -98,6 +102,7 @@ export async function createOrder(
     const promises = [
       OrderService.createOrder(userId, address, paymentMethod, formattedCart),
       CartService.completeCart(userId),
+      OrderService.sendOrderConfirmation(user?.email!),
     ];
 
     if (saveInfo) {
