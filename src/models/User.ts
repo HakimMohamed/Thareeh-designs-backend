@@ -16,6 +16,7 @@ export interface IUser extends Document {
     postalCode?: string;
     region: string;
     type: 'home' | 'office';
+    details: string;
   }[];
 }
 

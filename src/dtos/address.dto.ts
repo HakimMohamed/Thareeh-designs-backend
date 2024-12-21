@@ -9,6 +9,7 @@ export interface CreateNewAddressDto {
   postalCode?: string;
   region: string;
   type: 'office' | 'home';
+  details: string;
 }
 
 export interface GetUserAddressByIdDto {

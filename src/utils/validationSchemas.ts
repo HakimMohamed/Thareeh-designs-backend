@@ -216,6 +216,8 @@ export const createOrderSchema = [
   body('address.phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
   body('address.postalCode').optional(),
   body('address.region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+  body('address.type').exists({ checkFalsy: true }).withMessage('Type is required.'),
+  body('address.details').exists({ checkFalsy: true }).withMessage('Details is required.'),
 ];
 
 export const submitTicketSchema = [
