@@ -1,5 +1,4 @@
 export interface CreateNewAddressDto {
-  email: string;
   city: string;
   country: string;
   name: {

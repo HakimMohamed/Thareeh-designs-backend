@@ -34,8 +34,10 @@ export async function createNewUserAddress(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const userId = req.user?.userId!;
+
   try {
-    await AddressService.createNewUserAddress(req.body);
+    await AddressService.createNewUserAddress(userId, req.body);
 
     res.status(200).send({
       message: `Address created successfully.`,

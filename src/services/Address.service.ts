@@ -8,25 +8,26 @@ class AddressService {
     return Country.find({}).lean<ICountry[] | null>();
   }
 
-  async createNewUserAddress({
-    email,
-    city,
-    country,
-    name,
-    phone,
-    region,
-    postalCode,
-  }: {
-    email: string;
-    city: string;
-    country: string;
-    name: { first: string; last: string };
-    phone: string;
-    region: string;
-    postalCode?: string;
-  }): Promise<UpdateResult> {
+  async createNewUserAddress(
+    userId: string,
+    {
+      city,
+      country,
+      name,
+      phone,
+      region,
+      postalCode,
+    }: {
+      city: string;
+      country: string;
+      name: { first: string; last: string };
+      phone: string;
+      region: string;
+      postalCode?: string;
+    }
+  ): Promise<UpdateResult> {
     return User.updateOne(
-      { email },
+      { _id: toObjectId(userId) },
       { $push: { addresses: { city, country, name, phone, region, postalCode } } }
     );
   }

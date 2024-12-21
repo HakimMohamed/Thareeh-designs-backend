@@ -5,6 +5,8 @@ import { CreateOrderDto, GetUserOrdersDto } from '../dtos/order.dto';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
 import { ICartItem } from '../models/Cart';
+import AuthService from '../services/Auth.service';
+import AddressService from '../services/Address.service';
 
 export async function createOrder(
   req: Request<{}, {}, CreateOrderDto>,
@@ -42,10 +44,16 @@ export async function createOrder(
 
     const formattedCart = CartService.formatCart(cart, fetchedItems);
 
-    await Promise.all([
-      OrderService.createOrder(userId, address, paymentMethod, formattedCart, saveInfo),
+    const promises = [
+      OrderService.createOrder(userId, address, paymentMethod, formattedCart),
       CartService.completeCart(userId),
-    ]);
+    ];
+
+    if (saveInfo) {
+      promises.push(AddressService.createNewUserAddress(userId, address));
+    }
+
+    await Promise.all(promises);
 
     res.status(201).send({
       message: `Order created successfully.`,

@@ -22,8 +22,7 @@ class OrderService {
     userId: string,
     address: IOrder['shippingAddress'],
     paymentMethod: 'online' | 'cod',
-    cart: IFormattedCart,
-    saveInfo?: boolean
+    cart: IFormattedCart
   ): Promise<IOrder> {
     const formattedOrder: Omit<IOrder, '_id'> = {
       _user: toObjectId(userId),
@@ -37,6 +36,8 @@ class OrderService {
       price: {
         total: cart.price,
         shipping: 20, // temp value
+        discount: cart.originalPrice - cart.price,
+        tax: 0,
       },
     };
 

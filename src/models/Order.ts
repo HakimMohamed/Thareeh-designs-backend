@@ -17,6 +17,8 @@ export interface IOrder {
   price: {
     total: number;
     shipping: number;
+    discount: number;
+    tax: number;
   };
 }
 
