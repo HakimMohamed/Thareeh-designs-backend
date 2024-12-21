@@ -5,16 +5,12 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { ObjectId, UpdateResult } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
-import createEmailTransporter from '../config/nodeMailer';
 import LoggingService from './Log.service';
-import { toObjectId, formatEgyptianTime } from '../utils/helpers';
+import { toObjectId } from '../utils/helpers';
+import EmailService from './Email.service';
 
 class UserService {
-  private transporter: Transporter;
-
-  constructor() {
-    this.transporter = createEmailTransporter();
-  }
+  constructor() {}
   async register(
     email: string,
     password: string,
@@ -112,6 +108,8 @@ class UserService {
   }
 
   async sendOTPEmail(email: string, otp: string): Promise<void> {
+    const emailService = await EmailService.getInstance();
+
     const message = `Your OTP code is: ${otp}`;
     const mailOptions: SendMailOptions = {
       from: process.env.EMAIL_USER,
@@ -121,7 +119,7 @@ class UserService {
       html: `<p>Your OTP code is: <strong>${otp}</strong></p>`,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    await emailService.sendEmail(mailOptions);
   }
 
   async getUserOtpByDate({ email }: { email?: string }): Promise<IUserOtp | null> {
