@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { ICart, IFormattedCart } from '../models/Cart';
 import Order, { IOrder } from '../models/Order';
 import { IUser } from '../models/User';
@@ -44,6 +45,13 @@ class OrderService {
     const newOrder = new Order(formattedOrder);
 
     return newOrder.save();
+  }
+
+  async cancelOrder(orderId: string, userId: string) {
+    return Order.updateOne(
+      { _id: toObjectId(orderId), _user: toObjectId(userId) },
+      { status: 'cancelled' }
+    );
   }
 }
 

@@ -1,12 +1,63 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '../services/Order.service';
 import { GetUserOrderByIdResponse, GetUserOrdersResponse } from '../types/order';
-import { CreateOrderDto, GetUserOrdersDto } from '../dtos/order.dto';
+import { CancelOrderDto, CreateOrderDto, GetUserOrdersDto } from '../dtos/order.dto';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
 import { ICartItem } from '../models/Cart';
 import AuthService from '../services/Auth.service';
 import AddressService from '../services/Address.service';
+
+export async function cancelOrder(
+  req: Request<{}, {}, CancelOrderDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { orderId } = req.body;
+
+  const userId = req.user?.userId!;
+
+  try {
+    const order = await OrderService.getUserOrderById(orderId, userId);
+
+    if (!order) {
+      res.status(404).send({
+        message: 'Order not found.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    if (order.status === 'cancelled') {
+      res.status(400).send({
+        message: 'Order already cancelled.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    if (order.status === 'delivered') {
+      res.status(400).send({
+        message: 'Order already delivered request refund.',
+        data: null,
+        success: false,
+      });
+      return;
+    }
+
+    await OrderService.cancelOrder(orderId, userId);
+
+    res.status(201).send({
+      message: `Order cancelled successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
 
 export async function createOrder(
   req: Request<{}, {}, CreateOrderDto>,

@@ -222,3 +222,11 @@ export const submitTicketSchema = [
   body('subject').exists({ checkFalsy: true }).withMessage('Title is required.'),
   body('description').exists({ checkFalsy: true }).withMessage('Description is required.'),
 ];
+
+export const cancelOrderSchema = [
+  body('orderId')
+    .isMongoId()
+    .withMessage('Invalid order id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Order id is required.'),
+];

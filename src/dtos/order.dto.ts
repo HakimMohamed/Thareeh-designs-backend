@@ -12,3 +12,7 @@ export interface CreateOrderDto {
   address: IOrder['shippingAddress'];
   saveInfo?: boolean;
 }
+
+export interface CancelOrderDto {
+  orderId: string;
+}
