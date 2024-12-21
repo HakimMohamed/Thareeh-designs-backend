@@ -3,6 +3,7 @@ import { ICountry } from '../models/Country';
 import Country from '../models/Country';
 import User, { IUser } from '../models/User';
 import { toObjectId } from '../utils/helpers';
+import { CreateNewAddressDto } from '../dtos/address.dto';
 class AddressService {
   async getCountries(): Promise<ICountry[] | null> {
     return Country.find({}).lean<ICountry[] | null>();
@@ -10,25 +11,11 @@ class AddressService {
 
   async createNewUserAddress(
     userId: string,
-    {
-      city,
-      country,
-      name,
-      phone,
-      region,
-      postalCode,
-    }: {
-      city: string;
-      country: string;
-      name: { first: string; last: string };
-      phone: string;
-      region: string;
-      postalCode?: string;
-    }
+    { city, country, name, phone, region, postalCode, type }: CreateNewAddressDto
   ): Promise<UpdateResult> {
     return User.updateOne(
       { _id: toObjectId(userId) },
-      { $push: { addresses: { city, country, name, phone, region, postalCode } } }
+      { $push: { addresses: { city, country, name, phone, region, postalCode, type } } }
     );
   }
 

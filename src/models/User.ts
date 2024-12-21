@@ -15,6 +15,7 @@ export interface IUser extends Document {
     phone: string;
     postalCode?: string;
     region: string;
+    type: 'home' | 'office';
   }[];
 }
 
@@ -28,6 +29,7 @@ export const addressSchema: Schema = new Schema({
   phone: { type: String, required: true },
   postalCode: { type: String },
   region: { type: String, required: true },
+  type: { type: String, default: 'home' },
 });
 
 const userSchema: Schema = new Schema<IUser>(
