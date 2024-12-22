@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import OrderService from '../services/Order.service';
-import { GetUserOrderByIdResponse, GetUserOrdersResponse } from '../types/order';
+import {
+  CreateOrderResponse,
+  GetUserOrderByIdResponse,
+  GetUserOrdersResponse,
+} from '../types/order';
 import { CancelOrderDto, CreateOrderDto, GetUserOrdersDto } from '../dtos/order.dto';
 import CartService from '../services/Cart.service';
 import ItemService from '../services/Item.service';
@@ -8,6 +12,7 @@ import { ICartItem } from '../models/Cart';
 import AuthService from '../services/Auth.service';
 import AddressService from '../services/Address.service';
 import EmailService from '../services/Email.service';
+import { IOrder } from '../models/Order';
 
 export async function cancelOrder(
   req: Request<{}, {}, CancelOrderDto>,
@@ -62,7 +67,7 @@ export async function cancelOrder(
 
 export async function createOrder(
   req: Request<{}, {}, CreateOrderDto>,
-  res: Response,
+  res: Response<CreateOrderResponse>,
   next: NextFunction
 ): Promise<void> {
   const { address, paymentMethod, saveInfo } = req.body;
@@ -102,18 +107,19 @@ export async function createOrder(
     const promises = [
       OrderService.createOrder(userId, address, paymentMethod, formattedCart),
       CartService.completeCart(userId),
-      OrderService.sendOrderConfirmation(user?.email!),
     ];
 
     if (saveInfo) {
       promises.push(AddressService.createNewUserAddress(userId, address));
     }
 
-    await Promise.all(promises);
+    const result = await Promise.all(promises);
+
+    OrderService.sendOrderConfirmation(user?.email!);
 
     res.status(201).send({
       message: `Order created successfully.`,
-      data: null,
+      data: result[0] as IOrder,
       success: true,
     });
   } catch (error: any) {

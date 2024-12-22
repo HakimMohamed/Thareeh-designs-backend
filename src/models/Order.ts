@@ -1,6 +1,5 @@
 // models/User.ts
 import mongoose, { Document, ObjectId, Schema, Types } from 'mongoose';
-import { IItem, itemsSchema } from './Item';
 import { addressSchema, IUser } from './User';
 import { ICartItem, IFormattedCart } from './Cart';
 
@@ -30,7 +29,23 @@ const orderSchema: Schema = new Schema<IOrder>(
       required: true,
       index: 'asc',
     },
-    items: itemsSchema,
+    items: [
+      {
+        type: {
+          _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: true },
+          name: { type: String, required: true },
+          quantity: { type: Number, required: true, default: 1 },
+          originalPrice: { type: Number, required: true },
+          price: { type: Number, required: true },
+          image: { type: String, required: true },
+          discount: {
+            active: { type: Boolean, default: false },
+            value: { type: Number, default: 0 },
+          },
+        },
+        required: true,
+      },
+    ],
     status: {
       type: String,
       enum: ['pending', 'active', 'delivered', 'cancelled'],

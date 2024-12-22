@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { ObjectId, UpdateResult } from 'mongoose';
 import { ICart, IFormattedCart } from '../models/Cart';
 import Order, { IOrder } from '../models/Order';
 import { IUser } from '../models/User';
@@ -26,7 +26,7 @@ class OrderService {
     address: IOrder['shippingAddress'],
     paymentMethod: 'online' | 'cod',
     cart: IFormattedCart
-  ): Promise<IOrder> {
+  ): Promise<IOrder | UpdateResult> {
     const formattedOrder: Omit<IOrder, '_id'> = {
       _user: toObjectId(userId),
       items: cart.items,
@@ -44,9 +44,7 @@ class OrderService {
       },
     };
 
-    const newOrder = new Order(formattedOrder);
-
-    return newOrder.save();
+    return Order.create(formattedOrder);
   }
 
   async cancelOrder(orderId: string, userId: string) {

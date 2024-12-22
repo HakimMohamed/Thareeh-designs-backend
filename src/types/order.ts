@@ -8,3 +8,6 @@ export interface GetUserOrdersResponse extends BaseResponse {
 export interface GetUserOrderByIdResponse extends BaseResponse {
   data: IOrder | null;
 }
+export interface CreateOrderResponse extends BaseResponse {
+  data: IOrder | null;
+}
