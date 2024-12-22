@@ -93,7 +93,7 @@ class CartService {
     return Cart.deleteOne({ _user: toObjectId(userId) });
   }
   async getUserCart(userId: string): Promise<ICart | null> {
-    return Cart.findOne({ _user: toObjectId(userId) }).lean<ICart | null>();
+    return Cart.findOne({ _user: toObjectId(userId), status: 'active' }).lean<ICart | null>();
   }
 
   formatCart(cart: ICart, items: IItem[]): IFormattedCart {
