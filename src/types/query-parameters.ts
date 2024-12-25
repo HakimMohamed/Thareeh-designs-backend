@@ -1,7 +1,7 @@
 export interface GetItemsQueryParams {
   page?: string;
   pageSize?: string;
-  category?: string;
+  categories?: string;
 }
 export interface GetItemByIdQueryParams {
   id?: string;

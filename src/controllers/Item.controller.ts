@@ -12,9 +12,9 @@ export async function getItems(
   res: Response<GetItemsResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { page, pageSize, category } = req.query;
+  const { page, pageSize, categories } = req.query;
 
-  const categoriesArray = Array.isArray(category) ? category : category ? [category] : [];
+  const categoriesArray = (categories && categories.split(',')) || [];
 
   try {
     const { items, count, filters } = await ItemService.getItems(

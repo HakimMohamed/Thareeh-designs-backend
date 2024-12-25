@@ -79,7 +79,9 @@ async function generateItems() {
         name: filename, // Use generated name
         price: Math.floor(Math.random() * 100) + 1,
         image: `/images/${file}`,
-        category: `category-${Math.floor(Math.random() * 10)}`,
+        category: ['anime', 'nature', 'inspirational-quotes', 'animals'][
+          Math.floor(Math.random() * 4)
+        ],
         description: `Description for ${filename}`,
         discount: {
           active: isActive,

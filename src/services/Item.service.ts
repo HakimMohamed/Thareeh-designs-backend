@@ -1,7 +1,6 @@
-import { ObjectId } from 'mongoose';
 import Item, { IItem } from '../models/Item';
 import { toObjectId } from '../utils/helpers';
-import { ICartItem } from '../models/Cart';
+
 class ItemService {
   async getItems(
     page: number,
