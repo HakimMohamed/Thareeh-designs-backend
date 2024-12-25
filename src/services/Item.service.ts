@@ -5,13 +5,22 @@ class ItemService {
   async getItems(
     page: number,
     pageSize: number,
-    categories: string[]
+    categories: string[],
+    sort: string
   ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
     const match: any = {};
 
     if (categories && categories.length > 0) {
       match.category = { $in: categories };
     }
+
+    const sortMap: { [key: string]: any } = {
+      'price-low-to-high': { price: 1, _id: -1 },
+      'price-high-to-low': { price: -1, _id: -1 },
+    };
+
+    const sortStage = sortMap[sort] || { _id: -1 };
+
     const [items, count, filters]: [IItem[], number, string[]] = await Promise.all([
       Item.find(match, {
         name: 1,
@@ -24,6 +33,7 @@ class ItemService {
           'discount.active': { $ifNull: ['$discount.active', false] },
         },
       })
+        .sort(sortStage)
         .skip(pageSize * (page - 1))
         .limit(pageSize)
         .lean<IItem[]>(),

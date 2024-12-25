@@ -98,6 +98,7 @@ export const getItemsSchema = [
     .withMessage('Otp must be exactly 4 characters long.'),
 
   query('categories').optional(),
+  query('sort').optional(),
 ];
 
 export const getItemByIdSchema = [
