@@ -6,13 +6,20 @@ class ItemService {
     page: number,
     pageSize: number,
     categories: string[],
-    sort: string
+    sort: string,
+    minPrice: number,
+    maxPrice: number
   ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
     const match: any = {};
 
     if (categories && categories.length > 0) {
       match.category = { $in: categories };
     }
+
+    const priceMatch: any = {};
+    if (minPrice) priceMatch.$gte = minPrice;
+    if (maxPrice) priceMatch.$lte = maxPrice;
+    if (minPrice || maxPrice) match.price = priceMatch;
 
     const sortMap: { [key: string]: any } = {
       'price-low-to-high': { price: 1, _id: -1 },

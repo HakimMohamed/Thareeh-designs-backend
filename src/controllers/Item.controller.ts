@@ -12,7 +12,7 @@ export async function getItems(
   res: Response<GetItemsResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { page, pageSize, categories, sort } = req.query;
+  const { page, pageSize, categories, sort, minPrice, maxPrice } = req.query;
 
   const categoriesArray = (categories && categories.split(',')) || [];
 
@@ -21,7 +21,9 @@ export async function getItems(
       Number(page),
       Number(pageSize),
       categoriesArray,
-      sort as string
+      sort as string,
+      Number(minPrice),
+      Number(maxPrice)
     );
 
     res.status(200).send({

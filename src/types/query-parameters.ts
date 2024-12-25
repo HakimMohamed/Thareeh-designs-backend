@@ -3,6 +3,8 @@ export interface GetItemsQueryParams {
   pageSize?: string;
   categories?: string;
   sort?: string;
+  minPrice?: string;
+  maxPrice?: string;
 }
 export interface GetItemByIdQueryParams {
   id?: string;
