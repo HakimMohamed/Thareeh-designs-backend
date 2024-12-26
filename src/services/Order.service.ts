@@ -7,11 +7,18 @@ import EmailService from './Email.service';
 import { SendMailOptions } from 'nodemailer';
 
 class OrderService {
-  async getUserOrders(userId: string, page: number, pageSize: number): Promise<IOrder[] | null> {
-    return Order.find({ _user: toObjectId(userId) })
-      .skip(page * pageSize)
-      .limit(pageSize)
-      .lean<IOrder[] | null>();
+  async getUserOrders(
+    userId: string,
+    page: number,
+    pageSize: number
+  ): Promise<[IOrder[] | null, number]> {
+    return Promise.all([
+      Order.find({ _user: toObjectId(userId) })
+        .skip(page * pageSize)
+        .limit(pageSize)
+        .lean<IOrder[] | null>(),
+      Order.countDocuments({ _user: toObjectId(userId) }),
+    ]);
   }
 
   async getUserOrderById(orderId: string, userId: string): Promise<IOrder | null> {

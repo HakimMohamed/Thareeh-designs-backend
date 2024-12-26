@@ -137,11 +137,15 @@ export async function getUserOrders(
   const userId = req.user?.userId!;
 
   try {
-    const orders = await OrderService.getUserOrders(userId, Number(page), Number(pageSize));
+    const [orders, count] = await OrderService.getUserOrders(
+      userId,
+      Number(page),
+      Number(pageSize)
+    );
 
     res.status(200).send({
       message: `Orders fetched successfully.`,
-      data: orders,
+      data: { orders, count },
       success: true,
     });
   } catch (error: any) {
