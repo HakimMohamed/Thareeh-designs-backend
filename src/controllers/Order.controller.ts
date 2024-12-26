@@ -132,7 +132,7 @@ export async function getUserOrders(
   res: Response<GetUserOrdersResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { page = 0, pageSize = 10 } = req.query;
+  const { page = 1, pageSize = 10 } = req.query;
 
   const userId = req.user?.userId!;
 

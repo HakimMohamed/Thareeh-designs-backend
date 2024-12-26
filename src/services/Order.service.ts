@@ -14,7 +14,7 @@ class OrderService {
   ): Promise<[IOrder[] | null, number]> {
     return Promise.all([
       Order.find({ _user: toObjectId(userId) })
-        .skip(page * pageSize)
+        .skip((page - 1) * pageSize)
         .limit(pageSize)
         .lean<IOrder[] | null>(),
       Order.countDocuments({ _user: toObjectId(userId) }),
