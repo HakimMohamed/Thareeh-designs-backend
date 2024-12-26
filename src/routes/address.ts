@@ -15,8 +15,8 @@ import {
 
 const router = Router();
 
-router.get('/', getCountries);
-router.get('/user/', getUserAddresses);
+router.get('/', getUserAddresses);
+router.get('/countries', getCountries);
 router.get('/user/address', getUserAddressByIdSchema, validateSchema, getUserAddressById);
 
 router.delete('/user/address', removeUserAddressSchema, validateSchema, removeUserAddress);
