@@ -8,7 +8,7 @@ import { SendMailOptions } from 'nodemailer';
 
 class OrderService {
   async getUserOrders(userId: string, page: number, pageSize: number): Promise<IOrder[] | null> {
-    return Order.find({ _id: toObjectId(userId) })
+    return Order.find({ _user: toObjectId(userId) })
       .skip(page * pageSize)
       .limit(pageSize)
       .lean<IOrder[] | null>();
