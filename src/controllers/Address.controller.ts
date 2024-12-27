@@ -9,7 +9,30 @@ import {
   CreateNewAddressDto,
   GetUserAddressByIdDto,
   RemoveUserAddressDto,
+  UpdateUserAddressDto,
 } from '../dtos/address.dto';
+
+export async function updateUserAddress(
+  req: Request<{}, {}, UpdateUserAddressDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const newAddress = req.body;
+
+  const userId = req.user?.userId!;
+
+  try {
+    await AddressService.updateUserAddress(userId, newAddress);
+
+    res.status(200).send({
+      message: `Countries fetched successfully.`,
+      data: null,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
 
 export async function getCountries(
   req: Request,

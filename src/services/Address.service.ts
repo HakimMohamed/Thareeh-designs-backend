@@ -1,9 +1,9 @@
-import { UpdateResult } from 'mongoose';
+import { ObjectId, UpdateResult } from 'mongoose';
 import { ICountry } from '../models/Country';
 import Country from '../models/Country';
-import User, { IUser } from '../models/User';
+import User, { IUser, IUserAddress } from '../models/User';
 import { toObjectId } from '../utils/helpers';
-import { CreateNewAddressDto } from '../dtos/address.dto';
+import { CreateNewAddressDto, UpdateUserAddressDto } from '../dtos/address.dto';
 class AddressService {
   async getCountries(): Promise<ICountry[] | null> {
     return Country.find({}).lean<ICountry[] | null>();
@@ -48,6 +48,18 @@ class AddressService {
     return User.updateOne(
       { _id: toObjectId(userId) },
       { $pull: { addresses: { _id: toObjectId(addressId) } } }
+    );
+  }
+
+  async updateUserAddress(userId: string, newAddress: UpdateUserAddressDto): Promise<UpdateResult> {
+    const formattedAddressUpdates: IUserAddress = {
+      ...newAddress,
+      _id: toObjectId(newAddress._id),
+    };
+
+    return User.updateOne(
+      { _id: toObjectId(userId), 'addresses._id': newAddress._id },
+      { $set: { 'addresses.$': formattedAddressUpdates } }
     );
   }
 }

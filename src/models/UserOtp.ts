@@ -1,8 +1,8 @@
 // models/User.ts
-import mongoose, { Document, ObjectId, Schema } from 'mongoose';
+import mongoose, { Document, ObjectId, Schema, Types } from 'mongoose';
 
 export interface IUserOtp extends Document {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   email: string;
   otpEntered: boolean;
   trials: number;

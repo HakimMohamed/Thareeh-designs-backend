@@ -233,3 +233,18 @@ export const cancelOrderSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Order id is required.'),
 ];
+
+export const updateUserAddressSchema = [
+  body('_id')
+    .isMongoId()
+    .withMessage('Invalid address id.')
+    .exists({ checkFalsy: true })
+    .withMessage('Address id is required.'),
+  body('city').exists({ checkFalsy: true }).withMessage('City is required.'),
+  body('country').exists({ checkFalsy: true }).withMessage('Country is required.'),
+  body('name.first').exists({ checkFalsy: true }).withMessage('First name is required.'),
+  body('name.last').exists({ checkFalsy: true }).withMessage('Last name is required.'),
+  body('phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
+  body('postalCode').optional(),
+  body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+];

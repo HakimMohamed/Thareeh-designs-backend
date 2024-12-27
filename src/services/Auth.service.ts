@@ -3,7 +3,7 @@ import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { ObjectId, UpdateResult } from 'mongoose';
+import { Types, UpdateResult } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
 import LoggingService from './Log.service';
 import { toObjectId } from '../utils/helpers';
@@ -16,7 +16,7 @@ class UserService {
     password: string,
     firstName: string,
     lastName: string
-  ): Promise<{ accessToken: string; refreshToken: string; userId: ObjectId }> {
+  ): Promise<{ accessToken: string; refreshToken: string; userId: Types.ObjectId }> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -26,7 +26,7 @@ class UserService {
         last: lastName,
       },
       password: hashedPassword,
-    }) as IUser;
+    });
 
     const { accessToken, refreshToken } = this.generateTokens(
       user._id.toString(),
@@ -165,10 +165,10 @@ class UserService {
       throw new Error('Blocked For 10 minutes due to multiple failed attempts.');
     }
   }
-  async verifyUserOtp(otpDocId: ObjectId): Promise<void> {
+  async verifyUserOtp(otpDocId: Types.ObjectId): Promise<void> {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
-  async verifyUser(userId: ObjectId, refreshToken: string): Promise<UpdateResult> {
+  async verifyUser(userId: Types.ObjectId, refreshToken: string): Promise<UpdateResult> {
     return User.updateOne({ _id: userId }, { refreshToken });
   }
   async removeRefreshTokenFromUser(userId: string): Promise<void> {

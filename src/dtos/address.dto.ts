@@ -19,3 +19,18 @@ export interface GetUserAddressByIdDto {
 export interface RemoveUserAddressDto {
   id?: string;
 }
+
+export interface UpdateUserAddressDto {
+  _id: string;
+  city: string;
+  country: string;
+  name: {
+    first: string;
+    last: string;
+  };
+  phone: string;
+  postalCode?: string;
+  region: string;
+  type: 'office' | 'home';
+  details: string;
+}

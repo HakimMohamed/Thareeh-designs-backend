@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Types } from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 
 export function formatEgyptianTime(date: Date): Date {
   const utcOffset = 2 * 60 * 60 * 1000;
@@ -8,8 +8,8 @@ export function formatEgyptianTime(date: Date): Date {
   return utcDate;
 }
 
-export function toObjectId(id: string): Types.ObjectId {
-  return new Types.ObjectId(id);
+export function toObjectId(id: string): mongoose.Types.ObjectId {
+  return new mongoose.Types.ObjectId(id);
 }
 
 export function delay(ms: any) {
