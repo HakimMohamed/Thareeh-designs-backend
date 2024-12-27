@@ -11,11 +11,11 @@ class AddressService {
 
   async createNewUserAddress(
     userId: string,
-    { city, country, name, phone, region, postalCode, type }: CreateNewAddressDto
+    { city, country, name, phone, region, postalCode, type, details }: CreateNewAddressDto
   ): Promise<UpdateResult> {
     return User.updateOne(
       { _id: toObjectId(userId) },
-      { $push: { addresses: { city, country, name, phone, region, postalCode, type } } }
+      { $push: { addresses: { city, country, name, phone, region, postalCode, type, details } } }
     );
   }
 

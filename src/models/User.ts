@@ -33,6 +33,7 @@ export const addressSchema: Schema = new Schema({
   postalCode: { type: String },
   region: { type: String, required: true },
   type: { type: String, default: 'home' },
+  details: { type: String, required: true },
 });
 
 const userSchema: Schema = new Schema<IUser>(

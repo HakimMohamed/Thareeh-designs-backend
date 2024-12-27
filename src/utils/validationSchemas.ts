@@ -247,4 +247,5 @@ export const updateUserAddressSchema = [
   body('phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
   body('postalCode').optional(),
   body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+  body('details').exists({ checkFalsy: true }).withMessage('Details is required.'),
 ];
