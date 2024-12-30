@@ -99,6 +99,7 @@ export const getItemsSchema = [
 
   query('categories').optional(),
   query('sort').optional(),
+  query('text').optional(),
 ];
 
 export const getItemByIdSchema = [
@@ -108,6 +109,8 @@ export const getItemByIdSchema = [
     .exists({ checkFalsy: true })
     .withMessage('Item id is required.'),
 ];
+
+export const getItemsSearchResultsSchema = [query('text').optional()];
 
 export const getFeaturedItemsByIdSchema = [
   query('excludeId').isMongoId().withMessage('Invalid item id.').optional(),

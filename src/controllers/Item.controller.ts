@@ -3,8 +3,14 @@ import {
   FeaturedItemsDto,
   GetItemByIdQueryParams,
   GetItemsQueryParams,
+  GetItemsSearchResultsDto,
 } from '../types/query-parameters';
-import { GetFeaturedItemsResponse, GetItemByIdResponse, GetItemsResponse } from '../types/items';
+import {
+  GetFeaturedItemsResponse,
+  GetItemByIdResponse,
+  GetItemsResponse,
+  GetItemsSearchResultsResponse,
+} from '../types/items';
 import ItemService from '../services/Item.service';
 
 export async function getItems(
@@ -12,7 +18,7 @@ export async function getItems(
   res: Response<GetItemsResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { page, pageSize, categories, sort, minPrice, maxPrice } = req.query;
+  const { page, pageSize, categories, sort, minPrice, maxPrice, text } = req.query;
 
   const categoriesArray = (categories && categories.split(',')) || [];
 
@@ -23,7 +29,8 @@ export async function getItems(
       categoriesArray,
       sort as string,
       Number(minPrice),
-      Number(maxPrice)
+      Number(maxPrice),
+      text!
     );
 
     res.status(200).send({
@@ -73,6 +80,25 @@ export async function getFeaturedItems(
       excludeId as string,
       parsedCartItems
     );
+    res.status(200).send({
+      message: `Items fetched successfully.`,
+      data: items,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function getItemsSearchResults(
+  req: Request<{}, {}, {}, GetItemsSearchResultsDto>,
+  res: Response<GetItemsSearchResultsResponse>,
+  next: NextFunction
+): Promise<void> {
+  const { text = '' } = req.query;
+  try {
+    const items = await ItemService.getItemsSearchResults(text!);
+
     res.status(200).send({
       message: `Items fetched successfully.`,
       data: items,

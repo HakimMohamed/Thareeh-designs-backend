@@ -8,12 +8,17 @@ class ItemService {
     categories: string[],
     sort: string,
     minPrice: number,
-    maxPrice: number
+    maxPrice: number,
+    text: string
   ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
     const match: any = {};
 
     if (categories && categories.length > 0) {
       match.category = { $in: categories };
+    }
+
+    if (text) {
+      match.name = { $regex: text, $options: 'i' };
     }
 
     const priceMatch: any = {};
@@ -80,6 +85,13 @@ class ItemService {
     ]);
 
     return randomDocs;
+  }
+
+  async getItemsSearchResults(searchText: string): Promise<IItem[] | []> {
+    return Item.find({ name: { $regex: searchText, $options: 'i' } })
+      .sort({ _id: -1 })
+      .limit(5)
+      .lean<IItem[]>();
   }
 }
 
