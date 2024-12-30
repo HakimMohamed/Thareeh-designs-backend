@@ -171,6 +171,8 @@ export const createNewUserAddressSchema = [
   body('phone').exists({ checkFalsy: true }).withMessage('Phone is required.'),
   body('postalCode').optional(),
   body('region').exists({ checkFalsy: true }).withMessage('Region is required.'),
+  body('details').exists({ checkFalsy: true }).withMessage('Details is required.'),
+  body('type').exists({ checkFalsy: true }).withMessage('Type is required.'),
 ];
 
 export const removeUserAddressSchema = [
