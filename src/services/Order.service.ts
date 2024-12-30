@@ -14,6 +14,7 @@ class OrderService {
   ): Promise<[IOrder[] | null, number]> {
     return Promise.all([
       Order.find({ _user: toObjectId(userId) })
+        .sort({ createdAt: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .lean<IOrder[] | null>(),
