@@ -38,36 +38,36 @@ jobs:
         with:
           name: build
 
+      - name: Prepare SSH for connecting to EC2 instance
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_ELASTIC_IP }} >> ~/.ssh/known_hosts
+
       - name: Deploy to EC2
         env:
           EC2_USER: ubuntu
           EC2_HOST: ${{ secrets.EC2_ELASTIC_IP }}
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          # Prepare SSH for connecting to the EC2 instance
-          mkdir -p ~/.ssh
-          echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-          # Create the directory if it doesn't exist
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            # Create the thareeh-designs-backend directory under /home/ubuntu
+          # SSH into EC2 and create directory if not exists
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
             mkdir -p /home/ubuntu/thareeh-designs-backend
           EOF
 
-          # Upload build files to the thareeh-designs-backend directory
-          scp -o StrictHostKeyChecking=no build.tar.gz $EC2_USER@$EC2_HOST:/home/ubuntu/thareeh-designs-backend
+          # Upload build files to EC2
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa build.tar.gz $EC2_USER@$EC2_HOST:/home/ubuntu/thareeh-designs-backend
 
-          # SSH into the EC2 instance and deploy the application
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            # Navigate to the thareeh-designs-backend directory
+          # SSH into EC2 and deploy the application
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
             cd /home/ubuntu/thareeh-designs-backend
 
             # Extract the build files
             tar -xzf build.tar.gz
 
             # Install production dependencies (skip dev dependencies)
-            npm install --production
+            npm install
 
             # Ensure the .env file is not overwritten by GitHub Actions
             if [ -f .env ]; then
@@ -75,5 +75,5 @@ jobs:
             fi
 
             # Restart the application (using PM2 or your preferred process manager)
-            pm2 restart app  # Adjust if using a different process manager or script
+            pm2 restart app || pm2 start app.js  # Adjust if using a different process manager or script
           EOF
