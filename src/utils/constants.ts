@@ -10,6 +10,7 @@ const constants = {
     '/api/items/item',
     '/api/items',
     '/api/items/featured',
+    '/api/items/search',
   ],
 };
 
