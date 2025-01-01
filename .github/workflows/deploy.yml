@@ -22,9 +22,9 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # Archive the build output
+      # Archive the build output along with node_modules
       - name: Archive build output
-        run: tar -czf build.tar.gz dist
+        run: tar -czf build.tar.gz dist node_modules package.json package-lock.json
 
       # Upload artifact using v4
       - name: Upload build artifact
@@ -53,24 +53,33 @@ jobs:
           mkdir -p ~/.ssh
           echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+
+          # Copy the build artifact to the EC2 instance
           scp -o StrictHostKeyChecking=no build.tar.gz $EC2_USER@$EC2_HOST:/home/ubuntu/thareeh-designs-backend
+
+          # Connect to EC2 and set up the application
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /home/ubuntu/thareeh-designs-backend
+            
+            # Extract the archive
             tar -xzf build.tar.gz
 
-            cd dist 
+            # Move environment files if required
+            cp -n ../.env . || echo "Environment file exists"
+            cp -r ../enviroment . || echo "Environment folder exists"
 
-            cp ../.env .
+            # Install PM2 globally if not installed
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
 
-            cp -r ../enviroment .
-
-            # Check if the process exists, if not start it
+            # Start or restart the application using PM2
             if ! pm2 describe thareeh-backend > /dev/null; then
-              pm2 start index.js --name thareeh-backend
+              pm2 start dist/index.js --name thareeh-backend
             else
               pm2 restart thareeh-backend
             fi
 
-            # Save the process list for restart on reboot
+            # Save the PM2 process list
             pm2 save
           EOF
