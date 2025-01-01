@@ -83,5 +83,4 @@ jobs:
             # Save the PM2 process list
             pm2 save
 
-            sudo systemctl restart nginx
           EOF
