@@ -26,9 +26,9 @@ jobs:
       - name: Archive build output
         run: tar -czf build.tar.gz dist
 
-      # Upload artifact
+      # Upload artifact using v4
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: build.tar.gz
@@ -38,9 +38,9 @@ jobs:
     needs: build
 
     steps:
-      # Download the artifact
+      # Download the artifact using v4
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
 
