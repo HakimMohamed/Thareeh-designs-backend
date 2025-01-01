@@ -3,25 +3,30 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - main # Adjust to your deployment branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # Build the project
       - name: Build project
         run: npm run build
 
+      # Archive the build output
       - name: Archive build output
         run: tar -czf build.tar.gz dist
 
+      # Upload artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -33,17 +38,11 @@ jobs:
     needs: build
 
     steps:
+      # Download the artifact
       - name: Download build artifact
         uses: actions/download-artifact@v3
         with:
           name: build
-
-      - name: Prepare SSH for connecting to EC2 instance
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_ELASTIC_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         env:
@@ -51,29 +50,22 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_ELASTIC_IP }}
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          # SSH into EC2 and create directory if not exists
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
-            mkdir -p /home/ubuntu/thareeh-designs-backend
-          EOF
-
-          # Upload build files to EC2
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa build.tar.gz $EC2_USER@$EC2_HOST:/home/ubuntu/thareeh-designs-backend
-
-          # SSH into EC2 and deploy the application
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_HOST << 'EOF'
+          mkdir -p ~/.ssh
+          echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          scp -o StrictHostKeyChecking=no build.tar.gz $EC2_USER@$EC2_HOST:/home/ubuntu/thareeh-designs-backend
+          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /home/ubuntu/thareeh-designs-backend
-
-            # Extract the build files
             tar -xzf build.tar.gz
+            npm install --production
 
-            # Install production dependencies (skip dev dependencies)
-            npm install
-
-            # Ensure the .env file is not overwritten by GitHub Actions
-            if [ -f .env ]; then
-              cp .env .env.bak
+            # Check if the process exists, if not start it
+            if ! pm2 describe thareeh-backend > /dev/null; then
+              pm2 start dist/server.js --name thareeh-backend
+            else
+              pm2 restart thareeh-backend
             fi
 
-            # Restart the application (using PM2 or your preferred process manager)
-            pm2 restart app || pm2 start app.js  # Adjust if using a different process manager or script
+            # Save the process list for restart on reboot
+            pm2 save
           EOF
