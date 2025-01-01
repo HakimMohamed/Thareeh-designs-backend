@@ -57,11 +57,16 @@ jobs:
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /home/ubuntu/thareeh-designs-backend
             tar -xzf build.tar.gz
-            npm install --production
+
+            cd dist 
+
+            cp ../.env .
+
+            cp -r ../enviroment .
 
             # Check if the process exists, if not start it
             if ! pm2 describe thareeh-backend > /dev/null; then
-              pm2 start dist/server.js --name thareeh-backend
+              pm2 start index.js --name thareeh-backend
             else
               pm2 restart thareeh-backend
             fi
