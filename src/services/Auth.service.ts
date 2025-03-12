@@ -44,7 +44,11 @@ class UserService {
         userId: string;
       };
 
-      const session = await Session.findOne({ key: refreshToken, _user: decoded.userId }).lean();
+      const session = await Session.findOne({
+        key: refreshToken,
+        _user: decoded.userId,
+        status: 'active',
+      }).lean();
 
       if (!session) {
         return null;
@@ -164,10 +168,13 @@ class UserService {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
   async removeRefreshTokenFromUser(userId: string, refreshToken: string): Promise<void> {
-    await Session.deleteOne({ _id: toObjectId(userId), key: refreshToken });
+    await Session.deleteOne({ _user: toObjectId(userId), key: refreshToken });
   }
-  async increaseOtpAttempts(email: string): Promise<UpdateResult> {
-    return UserOtp.updateOne({ email }, { $inc: { trials: 1 } });
+  async increaseOtpAttempts(id: string): Promise<UpdateResult> {
+    return UserOtp.updateOne({ _id: toObjectId(id) }, { $inc: { trials: 1 } });
+  }
+  async createSession(userId: string, refreshToken: string): Promise<ISession> {
+    return Session.create({ key: refreshToken, _user: toObjectId(userId) });
   }
 }
 

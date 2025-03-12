@@ -185,7 +185,7 @@ export async function verifyOtp(
     const isMatch = await bcrypt.compare(otp, otpDoc.otp);
 
     if (!isMatch) {
-      await AuthService.increaseOtpAttempts(email);
+      await AuthService.increaseOtpAttempts(otpDoc._id.toString());
       res.status(403).send({
         message: 'Invalid OTP.',
         success: false,
@@ -198,7 +198,7 @@ export async function verifyOtp(
 
     await Promise.all([
       AuthService.verifyUserOtp(otpDoc._id),
-      AuthService.verifyUser(user._id, refreshToken),
+      AuthService.createSession(user._id.toString(), refreshToken),
     ]);
 
     res.status(200).send({
