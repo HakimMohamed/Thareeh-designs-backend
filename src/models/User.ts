@@ -18,7 +18,6 @@ export interface IUser extends Document {
   email: string;
   name: { first: string; last: string };
   password: string;
-  refreshToken: string | null;
   addresses: IUserAddress[];
 }
 
@@ -51,7 +50,6 @@ const userSchema: Schema = new Schema<IUser>(
       last: { type: String, required: true },
     },
     password: { type: String, required: true },
-    refreshToken: { type: String, default: null, index: 'asc' },
     addresses: {
       type: [addressSchema],
       default: [],

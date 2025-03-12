@@ -30,3 +30,12 @@ export function authenticateUser(req: Request): string | null {
     return null;
   }
 }
+
+export function decodeUserData(token: string) {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    return decoded.userId;
+  } catch (error) {
+    return null;
+  }
+}

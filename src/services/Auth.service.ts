@@ -1,4 +1,5 @@
 import User, { IUser } from '../models/User';
+import Session, { ISession } from '../models/Session';
 import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -28,56 +29,50 @@ class UserService {
       password: hashedPassword,
     });
 
-    const { accessToken, refreshToken } = this.generateTokens(
-      user._id.toString(),
-      email,
-      firstName,
-      lastName
-    );
+    const { accessToken, refreshToken } = this.generateTokens(user._id.toString(), email);
 
-    user.refreshToken = refreshToken;
-
-    await user.save();
+    await Promise.all([
+      Session.create({ key: refreshToken, _user: user._id.toString() }),
+      user.save(),
+    ]);
 
     return { accessToken, refreshToken, userId: user._id };
   }
-  async validateRefreshToken(refreshToken: string): Promise<IUser | null> {
+  async validateRefreshToken(refreshToken: string): Promise<ISession | null> {
     try {
       const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as {
         userId: string;
       };
 
-      const user = await User.findById(decoded.userId).lean();
+      const session = await Session.findOne({ key: refreshToken, _user: decoded.userId }).lean();
 
-      if (user?.refreshToken !== refreshToken) {
+      if (!session) {
         return null;
       }
 
-      return user as IUser;
+      return session;
     } catch (error) {
       return null;
     }
   }
   generateTokens(
     userId: string,
-    email: string,
-    firstName: string,
-    lastName: string
+    email: string
   ): {
     accessToken: string;
     refreshToken: string;
   } {
     return {
-      accessToken: this.generateAccessToken(userId, email, firstName, lastName),
-      refreshToken: this.generateRefreshToken(userId, email, firstName, lastName),
+      accessToken: this.generateAccessToken(userId, email),
+      refreshToken: this.generateRefreshToken(userId, email),
     };
   }
-  generateAccessToken(userId: string, email: string, firstName: string, lastName: string): string {
+  generateAccessToken(userId: string, email: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.JWT_EXPIRY,
     });
   }
-  generateRefreshToken(userId: string, email: string, firstName: string, lastName: string): string {
+  generateRefreshToken(userId: string, email: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     });
@@ -168,11 +163,8 @@ class UserService {
   async verifyUserOtp(otpDocId: Types.ObjectId): Promise<void> {
     await UserOtp.updateOne({ _id: otpDocId }, { otpEntered: true });
   }
-  async verifyUser(userId: Types.ObjectId, refreshToken: string): Promise<UpdateResult> {
-    return User.updateOne({ _id: userId }, { refreshToken });
-  }
-  async removeRefreshTokenFromUser(userId: string): Promise<void> {
-    await User.updateOne({ _id: userId }, { refreshToken: '' });
+  async removeRefreshTokenFromUser(userId: string, refreshToken: string): Promise<void> {
+    await Session.deleteOne({ _id: toObjectId(userId), key: refreshToken });
   }
   async increaseOtpAttempts(email: string): Promise<UpdateResult> {
     return UserOtp.updateOne({ email }, { $inc: { trials: 1 } });

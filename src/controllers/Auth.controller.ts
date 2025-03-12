@@ -17,6 +17,7 @@ import {
 } from '../types/auth';
 import AuthService from '../services/Auth.service';
 import bcrypt from 'bcryptjs';
+import { decodeUserData } from '../utils/helpers';
 
 export async function getUser(
   req: Request,
@@ -125,10 +126,7 @@ export async function completeRegsitration(
       lastName
     );
 
-    await Promise.all([
-      AuthService.verifyUserOtp(otpDoc._id),
-      AuthService.verifyUser(userId, refreshToken),
-    ]);
+    await AuthService.verifyUserOtp(otpDoc._id);
 
     res.status(200).send({
       message: 'Register successful.',
@@ -196,12 +194,7 @@ export async function verifyOtp(
       return;
     }
 
-    const { refreshToken, accessToken } = AuthService.generateTokens(
-      user._id.toString(),
-      email,
-      user.name.first,
-      user.name.last
-    );
+    const { refreshToken, accessToken } = AuthService.generateTokens(user._id.toString(), email);
 
     await Promise.all([
       AuthService.verifyUserOtp(otpDoc._id),
@@ -276,10 +269,15 @@ export async function refreshAccessToken(
   next: NextFunction
 ): Promise<void> {
   const { refreshToken } = req.body;
-  try {
-    const user = await AuthService.validateRefreshToken(refreshToken);
 
-    if (!user) {
+  const userId = decodeUserData(refreshToken);
+  try {
+    const [session, user] = await Promise.all([
+      AuthService.validateRefreshToken(refreshToken),
+      AuthService.getUserById(userId!?.toString()),
+    ]);
+
+    if (!session || !user) {
       res.status(403).send({
         message: 'Invalid refresh token.',
         data: null,
@@ -288,12 +286,7 @@ export async function refreshAccessToken(
       return;
     }
 
-    const newAccessToken = AuthService.generateAccessToken(
-      user._id.toString(),
-      user.email,
-      user.name.first,
-      user.name.last
-    );
+    const newAccessToken = AuthService.generateAccessToken(user._id.toString(), user.email);
     res.status(200).send({
       message: 'Access token refreshed successfully.',
       data: {
@@ -314,9 +307,9 @@ export async function logout(
   try {
     const refreshToken = req.body.refreshToken;
 
-    const user = await AuthService.validateRefreshToken(refreshToken);
+    const session = await AuthService.validateRefreshToken(refreshToken);
 
-    if (!user) {
+    if (!session) {
       res.status(403).send({
         message: 'Invalid refresh token.',
         data: null,
@@ -325,7 +318,7 @@ export async function logout(
       return;
     }
 
-    await AuthService.removeRefreshTokenFromUser(user._id.toString());
+    await AuthService.removeRefreshTokenFromUser(session._user.toString(), refreshToken);
 
     res.status(200).send({
       message: 'Logout successful',
