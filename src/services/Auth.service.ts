@@ -2,7 +2,7 @@ import User, { IUser } from '../models/User';
 import Session, { ISession } from '../models/Session';
 import UserOtp, { IUserOtp } from '../models/UserOtp';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { Types, UpdateResult } from 'mongoose';
 import { SendMailOptions, Transporter } from 'nodemailer';
@@ -22,10 +22,7 @@ class UserService {
 
     const user = new User({
       email,
-      name: {
-        first: firstName,
-        last: lastName,
-      },
+      name: { first: firstName, last: lastName },
       password: hashedPassword,
     });
 
@@ -40,9 +37,7 @@ class UserService {
   }
   async validateRefreshToken(refreshToken: string): Promise<ISession | null> {
     try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as {
-        userId: string;
-      };
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as { userId: string };
 
       const session = await Session.findOne({
         key: refreshToken,
@@ -59,13 +54,7 @@ class UserService {
       return null;
     }
   }
-  generateTokens(
-    userId: string,
-    email: string
-  ): {
-    accessToken: string;
-    refreshToken: string;
-  } {
+  generateTokens(userId: string, email: string): { accessToken: string; refreshToken: string } {
     return {
       accessToken: this.generateAccessToken(userId, email),
       refreshToken: this.generateRefreshToken(userId, email),
@@ -73,12 +62,12 @@ class UserService {
   }
   generateAccessToken(userId: string, email: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
-      expiresIn: process.env.JWT_EXPIRY,
+      expiresIn: process.env.JWT_EXPIRY as SignOptions['expiresIn'],
     });
   }
   generateRefreshToken(userId: string, email: string): string {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY as SignOptions['expiresIn'],
     });
   }
   async checkUserExistance(email: string): Promise<IUser | null> {
@@ -122,9 +111,7 @@ class UserService {
   }
 
   async getUserOtpByDate({ email }: { email?: string }): Promise<IUserOtp | null> {
-    const match: any = {
-      otpEntered: false,
-    };
+    const match: any = { otpEntered: false };
 
     const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
 
@@ -147,18 +134,9 @@ class UserService {
       });
 
       await UserOtp.updateOne(
-        {
-          email,
-          otpEntered: false,
-          createdAt: { $gte: tenMinutesAgo },
-        },
-        {
-          $inc: { trials: 1 },
-          $set: { otp: await this.hashOTP(otp) },
-        },
-        {
-          upsert: true,
-        }
+        { email, otpEntered: false, createdAt: { $gte: tenMinutesAgo } },
+        { $inc: { trials: 1 }, $set: { otp: await this.hashOTP(otp) } },
+        { upsert: true }
       );
     } else {
       throw new Error('Blocked For 10 minutes due to multiple failed attempts.');
