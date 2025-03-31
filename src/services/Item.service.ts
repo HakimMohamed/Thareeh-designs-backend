@@ -11,7 +11,7 @@ class ItemService {
     maxPrice: number,
     text: string
   ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
-    const match: any = {};
+    const match: any = { active: true };
 
     if (categories && categories.length > 0) {
       match.category = { $in: categories };
@@ -50,24 +50,24 @@ class ItemService {
         .limit(pageSize)
         .lean<IItem[]>(),
       Item.countDocuments(match),
-      Item.distinct('category'),
+      Item.distinct('category', { active: true }),
     ]);
 
     return { items, count, filters };
   }
 
   async getItemById(id: string): Promise<IItem | null> {
-    return Item.findOne({ _id: toObjectId(id) }).lean<IItem | null>();
+    return Item.findOne({ _id: toObjectId(id), active: true }).lean<IItem | null>();
   }
   async getItemsByIds(itemsIds: String[]): Promise<IItem[] | null> {
-    return Item.find({ _id: { $in: itemsIds } }).lean<IItem[] | null>();
+    return Item.find({ _id: { $in: itemsIds }, active: true }).lean<IItem[] | null>();
   }
   async getFeaturedItems(
     pageSize: number,
     excludeId?: string,
     cartItems?: string[] | []
   ): Promise<IItem[] | []> {
-    const match: any = {};
+    const match: any = { active: true };
 
     if (excludeId) {
       match._id = { $ne: toObjectId(excludeId) };
@@ -88,7 +88,7 @@ class ItemService {
   }
 
   async getItemsSearchResults(searchText: string): Promise<IItem[] | []> {
-    return Item.find({ name: { $regex: searchText, $options: 'i' } })
+    return Item.find({ name: { $regex: searchText, $options: 'i' }, active: true })
       .sort({ _id: -1 })
       .limit(5)
       .lean<IItem[]>();

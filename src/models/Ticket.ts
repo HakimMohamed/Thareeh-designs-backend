@@ -2,7 +2,14 @@ import mongoose, { ObjectId, Schema } from 'mongoose';
 
 export interface ITicket extends Document {
   _id: ObjectId;
-  _user: ObjectId;
+  user: {
+    _id: ObjectId;
+    email: string;
+    name: {
+      first: string;
+      last: string;
+    };
+  };
   subject: string;
   description: string;
   status: 'open' | 'in-progress' | 'closed';
@@ -14,11 +21,31 @@ export interface ITicket extends Document {
 
 const ticketSchema = new Schema<ITicket>(
   {
-    _user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: 'asc',
+    user: {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        index: 'asc',
+      },
+      email: {
+        type: String,
+        required: true,
+        trim: true,
+        index: 'asc',
+      },
+      name: {
+        first: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        last: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+      },
     },
     subject: {
       type: String,
