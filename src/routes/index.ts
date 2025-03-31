@@ -5,6 +5,7 @@ import cartRoutes from './cart';
 import addressRoutes from './address';
 import ordersRoutes from './order';
 import ticketRoutes from './ticket';
+import bannerRoutes from './banner';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use('/cart', cartRoutes);
 router.use('/addresses', addressRoutes);
 router.use('/orders', ordersRoutes);
 router.use('/tickets', ticketRoutes);
+router.use('/banner-settings', bannerRoutes);
 
 export default router;

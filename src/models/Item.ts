@@ -7,6 +7,7 @@ export interface IItem extends Document {
   description: string;
   image: string;
   category: string;
+  active: boolean;
   discount?: {
     active: boolean;
     value: number;
@@ -20,6 +21,7 @@ export const itemsSchema = new Schema<IItem>(
     description: { type: String, required: true },
     image: { type: String, required: true },
     category: { type: String, required: true, ref: 'Category' },
+    active: { type: Boolean, default: true },
     discount: {
       active: { type: Boolean, default: false },
       value: { type: Number, default: 0 },
@@ -29,6 +31,7 @@ export const itemsSchema = new Schema<IItem>(
 );
 
 itemsSchema.index({ price: 'asc' });
+itemsSchema.index({ active: 'asc' });
 
 const Item = model<IItem>('Item', itemsSchema, 'Items');
 
