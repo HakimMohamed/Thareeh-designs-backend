@@ -29,7 +29,10 @@ const orderSchema: Schema = new Schema<IOrder>(
   {
     user: {
       _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: 'asc' },
-      name: { type: String, required: true },
+      name: {
+        first: { type: String, required: true },
+        last: { type: String, required: true },
+      },
       email: { type: String, required: true },
     },
     items: [
