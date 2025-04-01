@@ -105,7 +105,7 @@ export async function createOrder(
     const formattedCart = CartService.formatCart(cart, fetchedItems);
 
     const promises = [
-      OrderService.createOrder(userId, address, paymentMethod, formattedCart),
+      OrderService.createOrder(userId, address, paymentMethod, formattedCart, user!),
       CartService.completeCart(userId),
     ];
 

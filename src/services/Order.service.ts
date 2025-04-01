@@ -13,19 +13,19 @@ class OrderService {
     pageSize: number
   ): Promise<[IOrder[] | null, number]> {
     return Promise.all([
-      Order.find({ _user: toObjectId(userId) })
+      Order.find({ "user._id": toObjectId(userId) })
         .sort({ createdAt: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .lean<IOrder[] | null>(),
-      Order.countDocuments({ _user: toObjectId(userId) }),
+      Order.countDocuments({ "user._id": toObjectId(userId) }),
     ]);
   }
 
   async getUserOrderById(orderId: string, userId: string): Promise<IOrder | null> {
     return Order.findOne({
       _id: toObjectId(orderId),
-      _user: toObjectId(userId),
+      'user._id': toObjectId(userId),
     }).lean<IOrder | null>();
   }
 
@@ -33,10 +33,15 @@ class OrderService {
     userId: string,
     address: IOrder['shippingAddress'],
     paymentMethod: 'online' | 'cod',
-    cart: IFormattedCart
+    cart: IFormattedCart,
+    user: IUser
   ): Promise<IOrder | UpdateResult> {
     const formattedOrder: Omit<IOrder, '_id'> = {
-      _user: toObjectId(userId),
+      user: {
+        _id: toObjectId(userId),
+        email: user.email,
+        name: user.name,
+      },
       items: cart.items,
       status: 'pending',
       shippingAddress: address,
@@ -57,7 +62,7 @@ class OrderService {
 
   async cancelOrder(orderId: string, userId: string) {
     return Order.updateOne(
-      { _id: toObjectId(orderId), _user: toObjectId(userId) },
+      { _id: toObjectId(orderId), "user._id": toObjectId(userId) },
       { status: 'cancelled' }
     );
   }
