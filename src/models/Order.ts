@@ -5,13 +5,17 @@ import { ICartItem, IFormattedCart } from './Cart';
 
 export interface IOrder {
   _id: Types.ObjectId;
-  _user: Types.ObjectId;
+  user: {
+    _id: Types.ObjectId;
+    name: IUser['name'];
+    email: IUser['email'];
+  };
   items: IFormattedCart['items'];
   status: 'pending' | 'active' | 'delivered' | 'cancelled';
   shippingAddress: Omit<IUser['addresses'][0], '_id'>;
   payment: {
     method: 'online' | 'cod';
-    status: string;
+    status: 'pending' | 'success';
   };
   price: {
     total: number;
@@ -23,11 +27,10 @@ export interface IOrder {
 
 const orderSchema: Schema = new Schema<IOrder>(
   {
-    _user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: 'asc',
+    user: {
+      _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: 'asc' },
+      name: { type: String, required: true },
+      email: { type: String, required: true },
     },
     items: [
       {
