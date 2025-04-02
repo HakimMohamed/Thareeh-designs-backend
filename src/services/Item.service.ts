@@ -41,8 +41,8 @@ class ItemService {
         image: 1,
         category: 1,
         discount: {
-          'discount.value': { $ifNull: ['$discount.value', 0] },
-          'discount.active': { $ifNull: ['$discount.active', false] },
+          value: { $ifNull: ['$discount.value', 0] },
+          active: { $ifNull: ['$discount.active', false] },
         },
       })
         .sort(sortStage)
