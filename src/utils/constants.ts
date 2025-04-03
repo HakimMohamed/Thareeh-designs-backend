@@ -12,6 +12,7 @@ const constants = {
     '/api/items/featured',
     '/api/items/search',
     '/api/banner-settings',
+    '/api/categories',
   ],
 };
 
