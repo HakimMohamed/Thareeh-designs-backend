@@ -13,6 +13,10 @@ const constants = {
     '/api/items/search',
     '/api/banner-settings',
     '/api/categories',
+    {
+      url: /^\/api\/categories\/[A-Za-z0-9_-]+$/,
+      methods: ['GET'],
+    },
   ],
 };
 

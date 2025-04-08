@@ -7,6 +7,13 @@ class CategoryService {
       .lean<ICategory[]>();
     return categories;
   }
+  async getCategoryByName(categoryName: string): Promise<ICategory | null> {
+    const category = await Category.findOne({
+      name: categoryName,
+      active: true,
+    }).lean<ICategory | null>();
+    return category;
+  }
 }
 
 export default new CategoryService();

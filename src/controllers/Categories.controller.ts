@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { SubmitUserTicket } from '../dtos/ticket.dto';
-import TicketService from '../services/Ticket.service';
-import { GetUserTicketsResponse } from '../types/tickets';
-import AuthService from '../services/Auth.service';
-import categoriesService from '../services/categories.service';
+import CategoriesService from '../services/categories.service';
 
 export async function getCategories(
   req: Request,
@@ -11,7 +7,26 @@ export async function getCategories(
   next: NextFunction
 ): Promise<void> {
   try {
-    const categories = await categoriesService.getCategories();
+    const categories = await CategoriesService.getCategories();
+
+    res.status(200).send({
+      message: `Categories fetched successfully.`,
+      data: categories,
+      success: true,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+}
+
+export async function getCategoryByName(
+  req: Request<{ category?: string }, {}, {}, {}>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { category } = req.params;
+  try {
+    const categories = await CategoriesService.getCategoryByName(category!);
 
     res.status(200).send({
       message: `Categories fetched successfully.`,
