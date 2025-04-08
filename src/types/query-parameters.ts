@@ -1,7 +1,7 @@
 export interface GetItemsQueryParams {
   page?: string;
   pageSize?: string;
-  categories?: string;
+  category?: string;
   sort?: string;
   minPrice?: string;
   maxPrice?: string;

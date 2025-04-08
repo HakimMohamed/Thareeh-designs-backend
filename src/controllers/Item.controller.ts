@@ -18,15 +18,13 @@ export async function getItems(
   res: Response<GetItemsResponse>,
   next: NextFunction
 ): Promise<void> {
-  const { page, pageSize, categories, sort, minPrice, maxPrice, text } = req.query;
-
-  const categoriesArray = (categories && categories.split(',')) || [];
+  const { page, pageSize, category, sort, minPrice, maxPrice, text } = req.query;
 
   try {
     const { items, count, filters } = await ItemService.getItems(
       Number(page),
       Number(pageSize),
-      categoriesArray,
+      category!,
       sort as string,
       Number(minPrice),
       Number(maxPrice),

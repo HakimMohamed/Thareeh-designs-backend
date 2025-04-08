@@ -5,7 +5,7 @@ class ItemService {
   async getItems(
     page: number,
     pageSize: number,
-    categories: string[],
+    category: string,
     sort: string,
     minPrice: number,
     maxPrice: number,
@@ -13,8 +13,8 @@ class ItemService {
   ): Promise<{ items: IItem[]; count: number; filters: string[] }> {
     const match: any = { active: true };
 
-    if (categories && categories.length > 0) {
-      match.category = { $in: categories };
+    if (category) {
+      match.category = category;
     }
 
     if (text) {

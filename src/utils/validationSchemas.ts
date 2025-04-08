@@ -96,8 +96,7 @@ export const getItemsSchema = [
     .withMessage('page size is required.')
     .isLength({ min: 1, max: 100 })
     .withMessage('Otp must be exactly 4 characters long.'),
-
-  query('categories').optional(),
+  query('category').optional(),
   query('sort').optional(),
   query('text').optional(),
 ];
